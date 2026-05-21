@@ -5,7 +5,7 @@ import { auth, isAdminSession } from '@/lib/auth'
 
 export async function PATCH(request: NextRequest) {
   const session = await auth.api.getSession({ headers: request.headers })
-  if (!isAdminSession(session)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  if (!session || !isAdminSession(session)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await request.json()
   const { name, email } = body
