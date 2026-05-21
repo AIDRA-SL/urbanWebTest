@@ -1,0 +1,342 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─────────────────────────────────────────────
+// CATEGORIES (self-referential, unlimited depth)
+// ─────────────────────────────────────────────
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  imageUrl    String?
+  sortOrder   Int        @default(0)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  parentId    String?
+  parent      Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryChildren")
+
+  products    Product[]  @relation("ProductCategories")
+
+  @@index([parentId])
+  @@index([slug])
+}
+
+// ─────────────────────────────────────────────
+// PRODUCTS
+// ─────────────────────────────────────────────
+
+model Product {
+  id           String           @id @default(cuid())
+  name         String
+  slug         String           @unique
+  description  String?
+  price        Float
+  comparePrice Float?
+  sku          String?          @unique
+  isActive     Boolean          @default(true)
+  isFeatured   Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  categories   Category[]       @relation("ProductCategories")
+  images       ProductImage[]
+  variants     ProductVariant[]
+  orderItems   OrderItem[]
+  promotions   Promotion[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([isActive, isFeatured])
+  @@index([isActive, createdAt])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  sortOrder Int      @default(0)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model ProductVariant {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size      String?
+  color     String?
+  stock     Int      @default(0)
+  sku       String?  @unique
+
+  @@index([productId])
+}
+
+// ─────────────────────────────────────────────
+// PROMOTIONS
+// ─────────────────────────────────────────────
+
+model Promotion {
+  id          String    @id @default(cuid())
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label       String?
+  badgeColor  String?   @default("#000000")
+  discountPct Int?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([isActive])
+  @@index([productId])
+}
+
+// ─────────────────────────────────────────────
+// HERO SLIDES
+// ─────────────────────────────────────────────
+
+model HeroSlide {
+  id             String   @id @default(cuid())
+  imageUrl       String
+  mobileImageUrl String?
+  headline       String?
+  subheadline    String?
+  ctaText        String?
+  ctaLink        String?
+  sortOrder      Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// ORDERS
+// ─────────────────────────────────────────────
+
+model Order {
+  id              String   @id @default(cuid())
+  orderNumber     String   @unique
+  status          String   @default("PENDING")
+  totalAmount     Float
+  currency        String   @default("EUR")
+  notes           String?
+
+  customerName    String?
+  customerEmail   String?
+  customerPhone   String?
+
+  shippingAddress String?
+
+  discountCode    String?
+  discountAmount  Float?
+
+  sessionId       String?
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  items           OrderItem[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([sessionId])
+  @@index([orderNumber])
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  variantId   String?
+  quantity    Int
+  unitPrice   Float
+  productName String
+  size        String?
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([productName])
+}
+
+// ─────────────────────────────────────────────
+// CART SESSIONS (abandonment tracking)
+// ─────────────────────────────────────────────
+
+model CartSession {
+  id          String   @id @default(cuid())
+  sessionId   String   @unique
+  cartData    String
+  itemCount   Int      @default(0)
+  totalValue  Float    @default(0)
+  isAbandoned Boolean  @default(false)
+  isConverted Boolean  @default(false)
+  lastSeenAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  ipCountry   String?
+  ipCity      String?
+
+  @@index([sessionId])
+  @@index([isAbandoned])
+  @@index([lastSeenAt])
+  @@index([isAbandoned, isConverted, createdAt])
+}
+
+// ─────────────────────────────────────────────
+// ANALYTICS EVENTS
+// ─────────────────────────────────────────────
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  type        String
+  sessionId   String
+  productId   String?
+  categoryId  String?
+  orderId     String?
+  searchQuery String?
+  pageUrl     String?
+  referrer    String?
+
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+
+  ipAddress   String?
+  ipCountry   String?
+  ipCity      String?
+  ipRegion    String?
+
+  userAgent   String?
+  deviceType  String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([type])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@index([utmSource])
+  @@index([productId])
+  @@index([type, createdAt])
+}
+
+// ─────────────────────────────────────────────
+// DISCOUNT CODES
+// ─────────────────────────────────────────────
+
+model DiscountCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  description String?
+  discountPct Int
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  maxUsages   Int?
+  usageCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+}
+
+// ─────────────────────────────────────────────
+// AUTH (managed by Better Auth)
+// ─────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  emailVerified Boolean   @default(false)
+  image         String?
+  phone         String?
+  address       String?
+  city          String?
+  postalCode    String?
+  province      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions      Session[]
+  accounts      Account[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Account {
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId            String
+  providerId           String
+  accessToken          String?
+  refreshToken         String?
+  accessTokenExpiresAt DateTime?
+  password             String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// BRANDS (logos colaboradores en landing)
+// ─────────────────────────────────────────────
+
+model Brand {
+  id        String   @id @default(cuid())
+  name      String
+  logoUrl   String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
