@@ -15,8 +15,8 @@ const nextConfig: NextConfig = {
   },
   serverExternalPackages: [
     '@prisma/client',
-    '@prisma/adapter-pg',
-    'pg',
+    '@prisma/adapter-libsql',
+    '@libsql/client',
     'geoip-lite',
     'sharp',
   ],
