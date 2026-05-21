@@ -32,7 +32,7 @@ const getNavCategories = unstable_cache(
     return roots
   },
   ['nav-categories'],
-  { revalidate: 600, tags: ['categories'] }
+  { revalidate: 60, tags: ['categories'] }
 )
 
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {

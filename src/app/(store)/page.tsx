@@ -21,7 +21,7 @@ const getHeroSlides = unstable_cache(
     orderBy: { sortOrder: 'asc' },
   }),
   ['hero-slides'],
-  { revalidate: 300, tags: ['hero'] }
+  { revalidate: 30, tags: ['hero'] }
 )
 
 const getActivePromotions = unstable_cache(
@@ -47,7 +47,7 @@ const getActivePromotions = unstable_cache(
     })
   },
   ['home-promotions'],
-  { revalidate: 300, tags: ['promotions'] }
+  { revalidate: 30, tags: ['promotions'] }
 )
 
 const getFeaturedProducts = unstable_cache(
@@ -61,7 +61,7 @@ const getFeaturedProducts = unstable_cache(
     take: 8,
   }),
   ['featured-products'],
-  { revalidate: 300, tags: ['products'] }
+  { revalidate: 30, tags: ['products'] }
 )
 
 const getActiveBrands = unstable_cache(
@@ -71,7 +71,7 @@ const getActiveBrands = unstable_cache(
     select: { id: true, name: true, logoUrl: true },
   }),
   ['active-brands'],
-  { revalidate: 600, tags: ['brands'] }
+  { revalidate: 60, tags: ['brands'] }
 )
 
 const getTopCategories = unstable_cache(
@@ -84,7 +84,7 @@ const getTopCategories = unstable_cache(
     return cats.map((c) => ({ ...c, children: [] }))
   },
   ['top-categories'],
-  { revalidate: 600, tags: ['categories'] }
+  { revalidate: 60, tags: ['categories'] }
 )
 
 export default async function HomePage() {
