@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth, isAdminSession } from '@/lib/auth'
 import { slugify } from '@/lib/utils'
-import { revalidateTag } from 'next/cache'
+import { revalidateTag, revalidatePath } from 'next/cache'
 
 const INCLUDE_FULL = {
   images: { orderBy: { sortOrder: 'asc' as const } },
