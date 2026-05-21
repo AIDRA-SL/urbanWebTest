@@ -2,11 +2,11 @@ import dotenv from 'dotenv'
 dotenv.config({ path: '.env.local' })
 dotenv.config({ path: '.env' })
 import { PrismaClient } from '../generated/prisma'
-import { PrismaLibSql } from '@prisma/adapter-libsql'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 function createPrisma() {
   const dbUrl = process.env.DATABASE_URL ?? 'file:./prisma/dev.db'
-  const adapter = new PrismaLibSql({ url: dbUrl })
+  const adapter = new PrismaPg({ connectionString: dbUrl })
   return new PrismaClient({ adapter })
 }
 

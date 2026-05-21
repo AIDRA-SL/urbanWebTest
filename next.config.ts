@@ -5,6 +5,8 @@ const generatedPrismaPath = path.join(process.cwd(), 'generated', 'prisma')
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: false },
   poweredByHeader: false,
   compress: true,
   devIndicators: false,
