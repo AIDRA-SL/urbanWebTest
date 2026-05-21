@@ -4,11 +4,12 @@ import path from 'path'
 const generatedPrismaPath = path.join(process.cwd(), 'generated', 'prisma')
 
 const nextConfig: NextConfig = {
+  reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
   devIndicators: false,
   experimental: {
-    staleTimes: { dynamic: 0, static: 0 },
+    staleTimes: { dynamic: 30, static: 300 },
   },
   serverExternalPackages: [
     '@prisma/client',
@@ -39,6 +40,8 @@ const nextConfig: NextConfig = {
     return config
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 86400,
     remotePatterns: [
       {
         protocol: 'https',
