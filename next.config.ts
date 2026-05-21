@@ -1,7 +1,4 @@
 import type { NextConfig } from 'next'
-import path from 'path'
-
-const generatedPrismaPath = path.join(process.cwd(), 'generated', 'prisma')
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -20,27 +17,6 @@ const nextConfig: NextConfig = {
     'geoip-lite',
     'sharp',
   ],
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      // Externalize the local generated Prisma client so webpack doesn't try
-      // to process node:* imports inside it
-      config.externals = config.externals || []
-      const externals = Array.isArray(config.externals)
-        ? config.externals
-        : [config.externals]
-      externals.push(
-        ({ request }: { request: string }, callback: (err: null, result?: string) => void) => {
-          if (request?.includes('generated/prisma')) {
-            // Use absolute path so Node.js can find it from .next/server at runtime
-            return callback(null, `commonjs ${generatedPrismaPath}`)
-          }
-          callback(null)
-        }
-      )
-      config.externals = externals
-    }
-    return config
-  },
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 86400,
