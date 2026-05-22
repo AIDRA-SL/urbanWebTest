@@ -75,10 +75,16 @@ export function Navbar({ categories }: NavbarProps) {
                 </div>
               ))}
               <Link
-                href="/ofertas"
+                href="/marcas"
                 className="text-xs uppercase tracking-widest text-gray-700 hover:text-black transition-colors"
               >
-                Ofertas
+                Marcas
+              </Link>
+              <Link
+                href="/contacto"
+                className="text-xs uppercase tracking-widest text-gray-700 hover:text-black transition-colors"
+              >
+                Contacto
               </Link>
             </nav>
 
@@ -191,11 +197,19 @@ export function Navbar({ categories }: NavbarProps) {
           ))}
           <div className="h-px bg-gray-100 my-1" />
           <Link
-            href="/ofertas"
+            href="/marcas"
             className="block py-3 text-xs uppercase tracking-widest font-semibold text-gray-900 hover:text-gray-500 transition-colors"
             onClick={() => setMobileOpen(false)}
           >
-            Ofertas
+            Marcas
+          </Link>
+          <div className="h-px bg-gray-100 my-1" />
+          <Link
+            href="/contacto"
+            className="block py-3 text-xs uppercase tracking-widest font-semibold text-gray-900 hover:text-gray-500 transition-colors"
+            onClick={() => setMobileOpen(false)}
+          >
+            Contacto
           </Link>
         </nav>
 
