@@ -41,16 +41,11 @@ export function Navbar({ categories }: NavbarProps) {
       >
         <AnnouncementBar />
 
-        {/* Row 1: Logo + Icons */}
+        {/* Row 1: Search | Logo (centered) | Account + Cart */}
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-14">
-            {/* Logo */}
-            <Link href="/" className="font-bold text-xl tracking-[0.15em] uppercase">
-              UrbanStore
-            </Link>
-
-            {/* Right controls */}
-            <div className="flex items-center gap-4">
+          <div className="grid grid-cols-3 items-center h-14">
+            {/* Left: search + hamburger (mobile) */}
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
                 className="p-1 hover:opacity-60 transition-opacity"
@@ -58,7 +53,24 @@ export function Navbar({ categories }: NavbarProps) {
               >
                 <Search size={20} strokeWidth={1.5} />
               </button>
+              <button
+                className="md:hidden p-1 hover:opacity-60 transition-opacity"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                aria-label="Menú"
+              >
+                {mobileOpen ? <X size={20} strokeWidth={1.5} /> : <Menu size={20} strokeWidth={1.5} />}
+              </button>
+            </div>
 
+            {/* Center: logo */}
+            <div className="flex justify-center">
+              <Link href="/" className="font-bold text-xl tracking-[0.15em] uppercase">
+                UrbanStore
+              </Link>
+            </div>
+
+            {/* Right: account + cart */}
+            <div className="flex items-center justify-end gap-4">
               <Link
                 href={session?.user ? '/mi-cuenta' : '/login'}
                 className="p-1 hover:opacity-60 transition-opacity"
@@ -84,14 +96,6 @@ export function Navbar({ categories }: NavbarProps) {
                     {totalItems > 9 ? '9+' : totalItems}
                   </span>
                 )}
-              </button>
-
-              <button
-                className="md:hidden p-1 hover:opacity-60 transition-opacity"
-                onClick={() => setMobileOpen(!mobileOpen)}
-                aria-label="Menú"
-              >
-                {mobileOpen ? <X size={20} strokeWidth={1.5} /> : <Menu size={20} strokeWidth={1.5} />}
               </button>
             </div>
           </div>
