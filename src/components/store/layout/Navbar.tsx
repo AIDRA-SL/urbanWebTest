@@ -44,21 +44,21 @@ export function Navbar({ categories }: NavbarProps) {
         {/* Row 1: Search | Logo (centered) | Account + Cart */}
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-3 items-center h-14">
-            {/* Left: search + hamburger (mobile) */}
+            {/* Left: hamburger (mobile) + search */}
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="p-1 hover:opacity-60 transition-opacity"
-                aria-label="Buscar"
-              >
-                <Search size={20} strokeWidth={1.5} />
-              </button>
               <button
                 className="md:hidden p-1 hover:opacity-60 transition-opacity"
                 onClick={() => setMobileOpen(!mobileOpen)}
                 aria-label="Menú"
               >
                 {mobileOpen ? <X size={20} strokeWidth={1.5} /> : <Menu size={20} strokeWidth={1.5} />}
+              </button>
+              <button
+                onClick={() => setSearchOpen(!searchOpen)}
+                className="p-1 hover:opacity-60 transition-opacity"
+                aria-label="Buscar"
+              >
+                <Search size={20} strokeWidth={1.5} />
               </button>
             </div>
 
@@ -166,9 +166,9 @@ export function Navbar({ categories }: NavbarProps) {
         aria-hidden="true"
       />
 
-      {/* Mobile slide panel (right → left) */}
+      {/* Mobile slide panel (left → right) */}
       <div
-        className={`md:hidden fixed top-0 right-0 h-screen w-72 bg-white z-50 flex flex-col transition-transform duration-300 ease-in-out ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`md:hidden fixed top-0 left-0 h-screen w-72 bg-white z-50 flex flex-col transition-transform duration-300 ease-in-out ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         {/* Panel header */}
         <div className="flex items-center justify-between px-6 h-16 border-b border-gray-100 shrink-0">

@@ -51,3 +51,6 @@ dev.db
 !/public/uploads/.gitkeep
 
 /generated/prisma
+
+.vercel
+.env*

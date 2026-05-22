@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { ImageCropModal } from '@/components/ui/ImageCropModal'
 import { Trash2, Plus, Upload } from 'lucide-react'
+
+const HERO_ASPECT = 16 / 9
 
 interface Slide {
   id: string
@@ -32,17 +35,34 @@ export function HeroAdminClient({ slides }: Props) {
   const [ctaLink, setCtaLink] = useState('')
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
+  const [cropFile, setCropFile] = useState<File | null>(null)
 
-  const handleUpload = async (files: FileList | null) => {
+  const handleFileSelect = (files: FileList | null) => {
     if (!files?.[0]) return
+    const file = files[0]
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        setCropFile(file)
+        setCropSrc(e.target.result as string)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const uploadBlob = async (blob: Blob) => {
     setUploading(true)
     const fd = new FormData()
-    fd.append('file', files[0])
+    const filename = blob instanceof File ? blob.name : 'hero.jpg'
+    fd.append('file', blob, filename)
     fd.append('subfolder', 'hero')
     const res = await fetch('/api/upload', { method: 'POST', body: fd })
     const data = await res.json()
     if (data.url) setImageUrl(data.url)
     setUploading(false)
+    setCropSrc(null)
+    setCropFile(null)
   }
 
   const handleCreate = async () => {
@@ -79,6 +99,18 @@ export function HeroAdminClient({ slides }: Props) {
   }
 
   return (
+    <>
+    {cropSrc && cropFile && (
+      <ImageCropModal
+        imageSrc={cropSrc}
+        originalFile={cropFile}
+        onConfirm={uploadBlob}
+        onSkip={uploadBlob}
+        onCancel={() => { setCropSrc(null); setCropFile(null) }}
+        aspect={HERO_ASPECT}
+        mimeType="image/jpeg"
+      />
+    )}
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {slides.map((slide) => (
@@ -131,10 +163,11 @@ export function HeroAdminClient({ slides }: Props) {
               {uploading ? <span className="text-xs text-gray-400">Subiendo…</span> : (
                 <>
                   <Upload size={20} className="text-gray-400 mb-1" />
-                  <span className="text-xs text-gray-400">Subir imagen (recomendado: 1920×800px)</span>
+                  <span className="text-xs text-gray-400">Subir imagen (recomendado: 1920×1080px)</span>
+                  <span className="text-xs text-gray-300 mt-0.5">Formato 16:9 · Se recortará automáticamente</span>
                 </>
               )}
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e.target.files)} />
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => { handleFileSelect(e.target.files); e.target.value = '' }} />
             </label>
           )}
 
@@ -151,5 +184,6 @@ export function HeroAdminClient({ slides }: Props) {
         </div>
       )}
     </div>
+    </>
   )
 }
