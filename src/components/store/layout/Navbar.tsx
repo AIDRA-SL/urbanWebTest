@@ -40,53 +40,14 @@ export function Navbar({ categories }: NavbarProps) {
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 bg-white/80 backdrop-blur-md border-b ${scrolled ? 'border-gray-200/60 shadow-sm shadow-black/5' : 'border-transparent'}`}
       >
         <AnnouncementBar />
+
+        {/* Row 1: Logo + Icons */}
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <Link href="/" className="font-bold text-xl tracking-[0.15em] uppercase">
               UrbanStore
             </Link>
-
-            {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-8">
-              {categories.map((cat) => (
-                <div key={cat.id} className="relative group">
-                  <Link
-                    href={`/categoria/${cat.slug}`}
-                    className="text-xs uppercase tracking-widest text-gray-700 hover:text-black transition-colors py-1"
-                  >
-                    {cat.name}
-                  </Link>
-                  {cat.children.length > 0 && (
-                    <div className="absolute left-0 top-full pt-2 hidden group-hover:block min-w-[160px] z-50">
-                      <div className="bg-white/90 backdrop-blur-md border border-white/40 shadow-xl shadow-black/10 py-2">
-                        {cat.children.map((child) => (
-                          <Link
-                            key={child.id}
-                            href={`/categoria/${cat.slug}/${child.slug}`}
-                            className="block px-4 py-2 text-xs uppercase tracking-wider text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                          >
-                            {child.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-              <Link
-                href="/marcas"
-                className="text-xs uppercase tracking-widest text-gray-700 hover:text-black transition-colors"
-              >
-                Marcas
-              </Link>
-              <Link
-                href="/contacto"
-                className="text-xs uppercase tracking-widest text-gray-700 hover:text-black transition-colors"
-              >
-                Contacto
-              </Link>
-            </nav>
 
             {/* Right controls */}
             <div className="flex items-center gap-4">
@@ -134,19 +95,65 @@ export function Navbar({ categories }: NavbarProps) {
               </button>
             </div>
           </div>
-
-          {/* Search bar expandable */}
-          {searchOpen && (
-            <div className="border-t border-gray-100 py-3">
-              <SearchBar onClose={() => setSearchOpen(false)} />
-            </div>
-          )}
         </div>
 
+        {/* Row 2: Desktop nav (centered, full-width) */}
+        <div className="hidden md:block border-t border-gray-100/70">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
+            <nav className="flex items-center justify-center gap-10 h-10">
+              {categories.map((cat) => (
+                <div key={cat.id} className="relative group">
+                  <Link
+                    href={`/categoria/${cat.slug}`}
+                    className="text-xs uppercase tracking-widest text-gray-600 hover:text-black transition-colors py-1"
+                  >
+                    {cat.name}
+                  </Link>
+                  {cat.children.length > 0 && (
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block min-w-[160px] z-50">
+                      <div className="bg-white/90 backdrop-blur-md border border-white/40 shadow-xl shadow-black/10 py-2">
+                        {cat.children.map((child) => (
+                          <Link
+                            key={child.id}
+                            href={`/categoria/${cat.slug}/${child.slug}`}
+                            className="block px-4 py-2 text-xs uppercase tracking-wider text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
+                          >
+                            {child.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+              <Link
+                href="/marcas"
+                className="text-xs uppercase tracking-widest text-gray-600 hover:text-black transition-colors"
+              >
+                Marcas
+              </Link>
+              <Link
+                href="/contacto"
+                className="text-xs uppercase tracking-widest text-gray-600 hover:text-black transition-colors"
+              >
+                Contacto
+              </Link>
+            </nav>
+          </div>
+        </div>
+
+        {/* Search bar expandable */}
+        {searchOpen && (
+          <div className="border-t border-gray-100 py-3">
+            <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
+              <SearchBar onClose={() => setSearchOpen(false)} />
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* Spacer for fixed header: 32px announcement bar + 64px nav = 96px */}
-      <div className="h-24" />
+      {/* Spacer: 32px announcement + 56px row1 + 40px row2 = 128px desktop / 88px mobile */}
+      <div className="h-[88px] md:h-32" />
 
       {/* Mobile menu backdrop */}
       <div
