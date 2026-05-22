@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useCartStore } from '@/store/cart'
 import { ShoppingBag, Search, Menu, X, User } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -64,8 +65,8 @@ export function Navbar({ categories }: NavbarProps) {
 
             {/* Center: logo */}
             <div className="flex justify-center">
-              <Link href="/" className="font-bold text-xl tracking-[0.15em] uppercase">
-                UrbanStore
+              <Link href="/">
+                <Image src="/logo-urban.jpg" alt="UrbanStore" width={140} height={40} className="h-10 w-auto object-contain" priority />
               </Link>
             </div>
 
