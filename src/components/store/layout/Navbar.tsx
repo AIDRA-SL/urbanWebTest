@@ -66,7 +66,7 @@ export function Navbar({ categories }: NavbarProps) {
             {/* Center: logo */}
             <div className="flex justify-center">
               <Link href="/">
-                <Image src="/logo-urban.jpg" alt="UrbanStore" width={140} height={40} className="h-10 w-auto object-contain" priority />
+                <Image src="/logo-urban.png" alt="UrbanStore" width={180} height={50} className="h-12 w-auto object-contain" priority />
               </Link>
             </div>
 
