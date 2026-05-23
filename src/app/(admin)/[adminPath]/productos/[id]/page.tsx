@@ -17,6 +17,7 @@ export default async function EditProductPage({ params }: Props) {
     where: { id },
     include: {
       images: { orderBy: { sortOrder: 'asc' } },
+      videos: { orderBy: { sortOrder: 'asc' } },
       variants: true,
       categories: { select: { id: true, name: true } },
     },

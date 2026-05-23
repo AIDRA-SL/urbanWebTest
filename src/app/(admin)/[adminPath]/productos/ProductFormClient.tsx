@@ -23,9 +23,9 @@ interface ProductData {
   sku?: string | null
   isActive?: boolean
   isFeatured?: boolean
-  videoUrl?: string | null
   categories?: { id: string }[]
   images?: { id: string; url: string; isPrimary: boolean }[]
+  videos?: { id?: string; url: string }[]
   variants?: { id?: string; size?: string | null; color?: string | null; stock?: number }[]
 }
 
@@ -53,7 +53,8 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
   const [variants, setVariants] = useState<{ size: string; stock: number }[]>(
     product?.variants?.filter((v) => v.size).map((v) => ({ size: v.size!, stock: v.stock ?? 0 })) ?? []
   )
-  const [videoUrl, setVideoUrl] = useState(product?.videoUrl ?? '')
+  const [videos, setVideos] = useState<{ url: string }[]>(product?.videos?.map((v) => ({ url: v.url })) ?? [])
+  const [videoInput, setVideoInput] = useState('')
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -137,7 +138,7 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
         sku: sku || null,
         isActive,
         isFeatured,
-        videoUrl: videoUrl || null,
+        videos,
         categoryIds: selectedCats,
         images,
         variants,
@@ -221,28 +222,69 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
           {uploading && <p className="text-xs text-gray-400">Subiendo imagen…</p>}
         </div>
 
-        {/* Video */}
+        {/* Videos */}
         <div className="bg-white border border-gray-100 p-6 space-y-3">
           <div className="flex items-center gap-2">
             <Video size={14} className="text-gray-400" />
-            <h3 className="text-xs uppercase tracking-widest text-gray-500">Vídeo del producto</h3>
+            <h3 className="text-xs uppercase tracking-widest text-gray-500">Vídeos del producto</h3>
           </div>
-          <p className="text-[11px] text-gray-400">Pega un enlace de Instagram Reel o TikTok. Se mostrará en la ficha del producto.</p>
-          <Input
-            label="URL de Instagram Reel o TikTok"
-            value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
-            placeholder="https://www.tiktok.com/@usuario/video/… o https://www.instagram.com/reel/…"
-          />
-          {videoUrl && (
-            <div className="flex items-center gap-2 text-[11px]">
-              {videoUrl.includes('tiktok.com') && (
-                <span className="bg-black text-white px-2 py-0.5 rounded font-medium">TikTok</span>
-              )}
-              {videoUrl.includes('instagram.com') && (
-                <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded font-medium">Instagram</span>
-              )}
-              <span className="text-gray-400">Vídeo enlazado</span>
+          <p className="text-[11px] text-gray-400">Añade los que quieras. Acepta enlaces de Instagram Reels y TikTok.</p>
+
+          {/* Input + Add button */}
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={videoInput}
+              onChange={(e) => setVideoInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  const url = videoInput.trim()
+                  if (url && (url.includes('tiktok.com') || url.includes('instagram.com'))) {
+                    setVideos((prev) => [...prev, { url }])
+                    setVideoInput('')
+                  }
+                }
+              }}
+              placeholder="https://www.tiktok.com/… o https://www.instagram.com/reel/…"
+              className="flex-1 border border-gray-200 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:border-black transition-colors"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const url = videoInput.trim()
+                if (url && (url.includes('tiktok.com') || url.includes('instagram.com'))) {
+                  setVideos((prev) => [...prev, { url }])
+                  setVideoInput('')
+                }
+              }}
+              className="px-3 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors whitespace-nowrap"
+            >
+              Añadir
+            </button>
+          </div>
+
+          {/* Video list */}
+          {videos.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {videos.map((v, i) => (
+                <div key={i} className="flex items-center gap-2 bg-gray-50 px-3 py-2">
+                  {v.url.includes('tiktok.com') && (
+                    <span className="shrink-0 bg-black text-white text-[9px] px-1.5 py-0.5 font-medium">TikTok</span>
+                  )}
+                  {v.url.includes('instagram.com') && (
+                    <span className="shrink-0 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[9px] px-1.5 py-0.5 font-medium">Instagram</span>
+                  )}
+                  <span className="text-xs text-gray-500 flex-1 truncate">{v.url}</span>
+                  <button
+                    type="button"
+                    onClick={() => setVideos((prev) => prev.filter((_, j) => j !== i))}
+                    className="shrink-0 text-gray-400 hover:text-black transition-colors"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </div>

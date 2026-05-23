@@ -23,6 +23,7 @@ function getProduct(slug: string) {
         where: { slug },
         include: {
           images: { orderBy: { sortOrder: 'asc' } },
+          videos: { orderBy: { sortOrder: 'asc' } },
           variants: true,
           categories: { select: { id: true, name: true, slug: true } },
         },
@@ -157,10 +158,14 @@ export default async function ProductPage({ params }: Props) {
       </div>
 
       {/* Video section */}
-      {product.videoUrl && (
+      {product.videos.length > 0 && (
         <div className="mt-16">
-          <h2 className="text-sm font-bold uppercase tracking-widest mb-6 text-center">Vídeo del producto</h2>
-          <VideoPlayer videoUrl={product.videoUrl} />
+          <h2 className="text-sm font-bold uppercase tracking-widest mb-8 text-center">Vídeos del producto</h2>
+          <div className="flex flex-wrap justify-center gap-6">
+            {product.videos.map((v) => (
+              <VideoPlayer key={v.id} videoUrl={v.url} />
+            ))}
+          </div>
         </div>
       )}
 

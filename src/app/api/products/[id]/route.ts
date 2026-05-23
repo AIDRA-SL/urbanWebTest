@@ -6,6 +6,7 @@ import { revalidateTag, revalidatePath } from 'next/cache'
 
 const INCLUDE_FULL = {
   images: { orderBy: { sortOrder: 'asc' as const } },
+  videos: { orderBy: { sortOrder: 'asc' as const } },
   variants: true,
   categories: { select: { id: true, name: true, slug: true } },
 }
@@ -32,13 +33,14 @@ export async function PUT(
 
   const { id } = await params
   const body = await request.json()
-  const { name, description, price, comparePrice, sku, isActive, isFeatured, videoUrl, categoryIds, images, variants } = body
+  const { name, description, price, comparePrice, sku, isActive, isFeatured, categoryIds, images, videos, variants } = body
 
   // Get slug before update for revalidatePath
   const existing = await prisma.product.findUnique({ where: { id }, select: { slug: true } })
 
-  // Delete and recreate images/variants so the form state is the source of truth
+  // Delete and recreate images/videos/variants so the form state is the source of truth
   await prisma.productImage.deleteMany({ where: { productId: id } })
+  await prisma.productVideo.deleteMany({ where: { productId: id } })
   await prisma.productVariant.deleteMany({ where: { productId: id } })
 
   const product = await prisma.product.update({
@@ -51,7 +53,6 @@ export async function PUT(
       sku: sku || null,
       isActive,
       isFeatured,
-      videoUrl: videoUrl || null,
       categories: {
         set: (categoryIds as string[])?.map((cid) => ({ id: cid })) ?? [],
       },
@@ -61,6 +62,12 @@ export async function PUT(
           altText: img.altText ?? null,
           sortOrder: i,
           isPrimary: i === 0,
+        })) ?? [],
+      },
+      videos: {
+        create: (videos as { url: string }[])?.map((v, i) => ({
+          url: v.url,
+          sortOrder: i,
         })) ?? [],
       },
       variants: {

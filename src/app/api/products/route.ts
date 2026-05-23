@@ -7,6 +7,7 @@ import { revalidateTag, revalidatePath } from 'next/cache'
 
 const INCLUDE_FULL = {
   images: { orderBy: { sortOrder: 'asc' as const } },
+  videos: { orderBy: { sortOrder: 'asc' as const } },
   variants: true,
   categories: { select: { id: true, name: true, slug: true } },
 }
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { name, description, price, comparePrice, sku, isActive, isFeatured, videoUrl, categoryIds, images, variants } = body
+    const { name, description, price, comparePrice, sku, isActive, isFeatured, categoryIds, images, videos, variants } = body
 
     const slug = slugify(name)
 
@@ -66,7 +67,6 @@ export async function POST(request: NextRequest) {
         sku: sku || null,
         isActive: isActive ?? true,
         isFeatured: isFeatured ?? false,
-        videoUrl: videoUrl || null,
         categories: {
           connect: (categoryIds as string[])?.map((id) => ({ id })) ?? [],
         },
@@ -76,6 +76,12 @@ export async function POST(request: NextRequest) {
             altText: img.altText ?? null,
             sortOrder: i,
             isPrimary: i === 0,
+          })) ?? [],
+        },
+        videos: {
+          create: (videos as { url: string }[])?.map((v, i) => ({
+            url: v.url,
+            sortOrder: i,
           })) ?? [],
         },
         variants: {
