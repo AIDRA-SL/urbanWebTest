@@ -63,6 +63,10 @@ function getEmbedUrl(url: string): string | null {
   return null
 }
 
+function isDirectVideo(url: string): boolean {
+  return /\.(mp4|mov|webm)(\?|$)/i.test(url) || url.includes('blob.vercel-storage.com')
+}
+
 function getModalAspectRatio(url: string): string {
   if ((url.includes('youtube.com') || url.includes('youtu.be')) && !url.includes('shorts')) return '16/9'
   return '9/16'
@@ -148,7 +152,7 @@ export function ProductImageGallery({ images, videos = [], productName }: Props)
                     <div className="w-full h-full bg-gray-900 flex flex-col items-center justify-center gap-0.5">
                       <Play size={14} className="text-white fill-white" />
                       <span className="text-[7px] text-white/60 font-bold tracking-wide leading-none">
-                        {parsePlatform(item.data.url) === 'tiktok' ? 'TikTok' : parsePlatform(item.data.url) === 'youtube' ? 'YouTube' : 'IG Reel'}
+                        {isDirectVideo(item.data.url) ? 'MP4' : parsePlatform(item.data.url) === 'tiktok' ? 'TikTok' : parsePlatform(item.data.url) === 'youtube' ? 'YouTube' : 'IG Reel'}
                       </span>
                     </div>
                   )}
@@ -222,7 +226,16 @@ export function ProductImageGallery({ images, videos = [], productName }: Props)
             style={{ aspectRatio: getModalAspectRatio(modalUrl), maxHeight: '90vh', maxWidth: getModalAspectRatio(modalUrl) === '16/9' ? '900px' : '384px' }}
             onClick={(e) => e.stopPropagation()}
           >
-            {getEmbedUrl(modalUrl) && (
+            {isDirectVideo(modalUrl) ? (
+              <video
+                key={modalUrl}
+                src={modalUrl}
+                controls
+                autoPlay
+                playsInline
+                className="absolute inset-0 w-full h-full rounded-xl bg-black"
+              />
+            ) : getEmbedUrl(modalUrl) ? (
               <iframe
                 key={modalUrl}
                 src={getEmbedUrl(modalUrl)!}
@@ -231,7 +244,7 @@ export function ProductImageGallery({ images, videos = [], productName }: Props)
                 className="absolute inset-0 w-full h-full border-0 rounded-xl"
                 title="Vídeo del producto"
               />
-            )}
+            ) : null}
           </div>
         </div>
       )}

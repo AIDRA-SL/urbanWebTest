@@ -55,6 +55,7 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
   )
   const [videos, setVideos] = useState<{ url: string }[]>(product?.videos?.map((v) => ({ url: v.url })) ?? [])
   const [videoInput, setVideoInput] = useState('')
+  const [uploadingVideo, setUploadingVideo] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -230,7 +231,37 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
           </div>
           <p className="text-[11px] text-gray-400">Acepta enlaces de YouTube (recomendado), Instagram Reels y TikTok.</p>
 
-          {/* Input + Add button */}
+          {/* Upload MP4 */}
+          <div>
+            <label className={`inline-flex items-center gap-2 px-3 py-2 border border-gray-200 text-xs cursor-pointer hover:border-gray-400 transition-colors ${uploadingVideo ? 'opacity-50 pointer-events-none' : ''}`}>
+              <Upload size={12} className="text-gray-500" />
+              {uploadingVideo ? 'Subiendo…' : 'Subir MP4 / MOV'}
+              <input
+                type="file"
+                accept="video/mp4,video/quicktime,video/webm"
+                className="hidden"
+                disabled={uploadingVideo}
+                onClick={(e) => { (e.target as HTMLInputElement).value = '' }}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  setUploadingVideo(true)
+                  try {
+                    const fd = new FormData()
+                    fd.append('file', file)
+                    fd.append('subfolder', 'videos')
+                    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+                    const data = await res.json()
+                    if (data.url) setVideos((prev) => [...prev, { url: data.url }])
+                  } finally {
+                    setUploadingVideo(false)
+                  }
+                }}
+              />
+            </label>
+          </div>
+
+          {/* URL input (YouTube) */}
           <div className="flex gap-2">
             <input
               type="url"
@@ -269,6 +300,9 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
             <div className="flex flex-col gap-2">
               {videos.map((v, i) => (
                 <div key={i} className="flex items-center gap-2 bg-gray-50 px-3 py-2">
+                  {v.url.includes('blob.vercel-storage.com') && (
+                    <span className="shrink-0 bg-blue-600 text-white text-[9px] px-1.5 py-0.5 font-medium">MP4</span>
+                  )}
                   {(v.url.includes('youtube.com') || v.url.includes('youtu.be')) && (
                     <span className="shrink-0 bg-red-600 text-white text-[9px] px-1.5 py-0.5 font-medium">YouTube</span>
                   )}

@@ -22,6 +22,22 @@ export async function saveUploadedFile(
   return blob.url
 }
 
+export async function saveUploadedVideo(
+  file: File,
+  subfolder = 'videos'
+): Promise<string> {
+  const ext = file.type === 'video/webm' ? 'webm' : file.type === 'video/quicktime' ? 'mov' : 'mp4'
+  const filename = `${nanoid()}.${ext}`
+  const buffer = Buffer.from(await file.arrayBuffer())
+
+  const blob = await put(`${subfolder}/${filename}`, buffer, {
+    access: 'public',
+    contentType: file.type,
+  })
+
+  return blob.url
+}
+
 export async function deleteUploadedFile(url: string): Promise<void> {
   try {
     if (url.includes('blob.vercel-storage.com')) {
