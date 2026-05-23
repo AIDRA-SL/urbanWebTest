@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { ImageCropModal } from '@/components/ui/ImageCropModal'
 import Image from 'next/image'
-import { X, Upload } from 'lucide-react'
+import { X, Upload, Video } from 'lucide-react'
 
 interface Category {
   id: string
@@ -23,6 +23,7 @@ interface ProductData {
   sku?: string | null
   isActive?: boolean
   isFeatured?: boolean
+  videoUrl?: string | null
   categories?: { id: string }[]
   images?: { id: string; url: string; isPrimary: boolean }[]
   variants?: { id?: string; size?: string | null; color?: string | null; stock?: number }[]
@@ -52,6 +53,7 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
   const [variants, setVariants] = useState<{ size: string; stock: number }[]>(
     product?.variants?.filter((v) => v.size).map((v) => ({ size: v.size!, stock: v.stock ?? 0 })) ?? []
   )
+  const [videoUrl, setVideoUrl] = useState(product?.videoUrl ?? '')
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -135,6 +137,7 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
         sku: sku || null,
         isActive,
         isFeatured,
+        videoUrl: videoUrl || null,
         categoryIds: selectedCats,
         images,
         variants,
@@ -216,6 +219,32 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
             </label>
           </div>
           {uploading && <p className="text-xs text-gray-400">Subiendo imagen…</p>}
+        </div>
+
+        {/* Video */}
+        <div className="bg-white border border-gray-100 p-6 space-y-3">
+          <div className="flex items-center gap-2">
+            <Video size={14} className="text-gray-400" />
+            <h3 className="text-xs uppercase tracking-widest text-gray-500">Vídeo del producto</h3>
+          </div>
+          <p className="text-[11px] text-gray-400">Pega un enlace de Instagram Reel o TikTok. Se mostrará en la ficha del producto.</p>
+          <Input
+            label="URL de Instagram Reel o TikTok"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            placeholder="https://www.tiktok.com/@usuario/video/… o https://www.instagram.com/reel/…"
+          />
+          {videoUrl && (
+            <div className="flex items-center gap-2 text-[11px]">
+              {videoUrl.includes('tiktok.com') && (
+                <span className="bg-black text-white px-2 py-0.5 rounded font-medium">TikTok</span>
+              )}
+              {videoUrl.includes('instagram.com') && (
+                <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded font-medium">Instagram</span>
+              )}
+              <span className="text-gray-400">Vídeo enlazado</span>
+            </div>
+          )}
         </div>
 
         {/* Variants / Sizes */}

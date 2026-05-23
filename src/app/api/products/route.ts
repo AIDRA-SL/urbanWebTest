@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { name, description, price, comparePrice, sku, isActive, isFeatured, categoryIds, images, variants } = body
+    const { name, description, price, comparePrice, sku, isActive, isFeatured, videoUrl, categoryIds, images, variants } = body
 
     const slug = slugify(name)
 
@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
         sku: sku || null,
         isActive: isActive ?? true,
         isFeatured: isFeatured ?? false,
+        videoUrl: videoUrl || null,
         categories: {
           connect: (categoryIds as string[])?.map((id) => ({ id })) ?? [],
         },

@@ -7,6 +7,7 @@ import { ProductGrid } from '@/components/store/product/ProductGrid'
 import type { Metadata } from 'next'
 import { ProductDetailClient } from './ProductDetailClient'
 import { ProductImageGallery } from '@/components/store/product/ProductImageGallery'
+import { VideoPlayer } from '@/components/store/product/VideoPlayer'
 import { ShieldCheck, Lock, Truck, RotateCcw } from 'lucide-react'
 
 export const revalidate = 3600
@@ -154,6 +155,14 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Video section */}
+      {product.videoUrl && (
+        <div className="mt-16">
+          <h2 className="text-sm font-bold uppercase tracking-widest mb-6 text-center">Vídeo del producto</h2>
+          <VideoPlayer videoUrl={product.videoUrl} />
+        </div>
+      )}
 
       {/* Related products */}
       {relatedProducts.length > 0 && (
