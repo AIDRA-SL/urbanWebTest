@@ -7,7 +7,6 @@ import { ProductGrid } from '@/components/store/product/ProductGrid'
 import type { Metadata } from 'next'
 import { ProductDetailClient } from './ProductDetailClient'
 import { ProductImageGallery } from '@/components/store/product/ProductImageGallery'
-import { VideoPlayer } from '@/components/store/product/VideoPlayer'
 import { ShieldCheck, Lock, Truck, RotateCcw } from 'lucide-react'
 
 export const revalidate = 3600
@@ -103,8 +102,8 @@ export default async function ProductPage({ params }: Props) {
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Images */}
-        <ProductImageGallery images={product.images} productName={product.name} />
+        {/* Images + Videos */}
+        <ProductImageGallery images={product.images} videos={product.videos} productName={product.name} />
 
         {/* Info */}
         <div className="flex flex-col gap-6">
@@ -157,19 +156,8 @@ export default async function ProductPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Video section */}
-      {product.videos.length > 0 && (
-        <div className="mt-16">
-          <h2 className="text-sm font-bold uppercase tracking-widest mb-8 text-center">Vídeos del producto</h2>
-          <div className="flex flex-wrap justify-center gap-6">
-            {product.videos.map((v) => (
-              <VideoPlayer key={v.id} videoUrl={v.url} />
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* Related products */}
+{/* Related products */}
       {relatedProducts.length > 0 && (
         <div className="mt-20">
           <h2 className="text-lg font-bold uppercase tracking-tight mb-8">También te puede gustar</h2>
