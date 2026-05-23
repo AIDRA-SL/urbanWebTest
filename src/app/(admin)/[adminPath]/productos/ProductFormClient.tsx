@@ -228,7 +228,7 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
             <Video size={14} className="text-gray-400" />
             <h3 className="text-xs uppercase tracking-widest text-gray-500">Vídeos del producto</h3>
           </div>
-          <p className="text-[11px] text-gray-400">Añade los que quieras. Acepta enlaces de Instagram Reels y TikTok.</p>
+          <p className="text-[11px] text-gray-400">Acepta enlaces de YouTube (recomendado), Instagram Reels y TikTok.</p>
 
           {/* Input + Add button */}
           <div className="flex gap-2">
@@ -240,20 +240,20 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
                 if (e.key === 'Enter') {
                   e.preventDefault()
                   const url = videoInput.trim()
-                  if (url && (url.includes('tiktok.com') || url.includes('instagram.com'))) {
+                  if (url && (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('tiktok.com') || url.includes('instagram.com'))) {
                     setVideos((prev) => [...prev, { url }])
                     setVideoInput('')
                   }
                 }
               }}
-              placeholder="https://www.tiktok.com/… o https://www.instagram.com/reel/…"
+              placeholder="https://www.youtube.com/watch?v=… (recomendado)"
               className="flex-1 border border-gray-200 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:border-black transition-colors"
             />
             <button
               type="button"
               onClick={() => {
                 const url = videoInput.trim()
-                if (url && (url.includes('tiktok.com') || url.includes('instagram.com'))) {
+                if (url && (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('tiktok.com') || url.includes('instagram.com'))) {
                   setVideos((prev) => [...prev, { url }])
                   setVideoInput('')
                 }
@@ -269,6 +269,9 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
             <div className="flex flex-col gap-2">
               {videos.map((v, i) => (
                 <div key={i} className="flex items-center gap-2 bg-gray-50 px-3 py-2">
+                  {(v.url.includes('youtube.com') || v.url.includes('youtu.be')) && (
+                    <span className="shrink-0 bg-red-600 text-white text-[9px] px-1.5 py-0.5 font-medium">YouTube</span>
+                  )}
                   {v.url.includes('tiktok.com') && (
                     <span className="shrink-0 bg-black text-white text-[9px] px-1.5 py-0.5 font-medium">TikTok</span>
                   )}

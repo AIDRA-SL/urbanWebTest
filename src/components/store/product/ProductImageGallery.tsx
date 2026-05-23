@@ -26,13 +26,32 @@ type MediaItem =
   | { kind: 'image'; data: ProductImage }
   | { kind: 'video'; data: ProductVideo }
 
-function parsePlatform(url: string): 'tiktok' | 'instagram' | null {
+function parsePlatform(url: string): 'tiktok' | 'instagram' | 'youtube' | null {
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
   if (url.includes('tiktok.com')) return 'tiktok'
   if (url.includes('instagram.com')) return 'instagram'
   return null
 }
 
+function getYouTubeId(url: string): string | null {
+  const patterns = [
+    /[?&]v=([A-Za-z0-9_-]{11})/,
+    /youtu\.be\/([A-Za-z0-9_-]{11})/,
+    /shorts\/([A-Za-z0-9_-]{11})/,
+    /embed\/([A-Za-z0-9_-]{11})/,
+  ]
+  for (const p of patterns) {
+    const m = url.match(p)
+    if (m) return m[1]
+  }
+  return null
+}
+
 function getEmbedUrl(url: string): string | null {
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    const id = getYouTubeId(url)
+    return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : null
+  }
   if (url.includes('tiktok.com')) {
     const match = url.match(/video\/(\d+)/)
     return match ? `https://www.tiktok.com/embed/v2/${match[1]}` : null
@@ -42,6 +61,11 @@ function getEmbedUrl(url: string): string | null {
     return match ? `https://www.instagram.com/${match[1]}/${match[2]}/embed/` : null
   }
   return null
+}
+
+function getModalAspectRatio(url: string): string {
+  if ((url.includes('youtube.com') || url.includes('youtu.be')) && !url.includes('shorts')) return '16/9'
+  return '9/16'
 }
 
 export function ProductImageGallery({ images, videos = [], productName }: Props) {
@@ -124,7 +148,7 @@ export function ProductImageGallery({ images, videos = [], productName }: Props)
                     <div className="w-full h-full bg-gray-900 flex flex-col items-center justify-center gap-0.5">
                       <Play size={14} className="text-white fill-white" />
                       <span className="text-[7px] text-white/60 font-bold tracking-wide leading-none">
-                        {parsePlatform(item.data.url) === 'tiktok' ? 'TikTok' : 'IG Reel'}
+                        {parsePlatform(item.data.url) === 'tiktok' ? 'TikTok' : parsePlatform(item.data.url) === 'youtube' ? 'YouTube' : 'IG Reel'}
                       </span>
                     </div>
                   )}
@@ -194,8 +218,8 @@ export function ProductImageGallery({ images, videos = [], productName }: Props)
 
           {/* iframe container — stops click propagation so clicking iframe doesn't close modal */}
           <div
-            className="relative w-full max-w-sm mx-4"
-            style={{ aspectRatio: '9/16', maxHeight: '90vh' }}
+            className="relative w-full mx-4"
+            style={{ aspectRatio: getModalAspectRatio(modalUrl), maxHeight: '90vh', maxWidth: getModalAspectRatio(modalUrl) === '16/9' ? '900px' : '384px' }}
             onClick={(e) => e.stopPropagation()}
           >
             {getEmbedUrl(modalUrl) && (
