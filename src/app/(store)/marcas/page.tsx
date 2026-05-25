@@ -31,28 +31,22 @@ export default async function MarcasPage() {
       {brands.length === 0 ? (
         <p className="text-sm text-gray-400">No hay marcas disponibles.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {brands.map((brand) => (
             <div
               key={brand.id}
-              className="flex flex-col items-center justify-center gap-3 p-6 border border-gray-100 hover:border-gray-300 transition-colors"
+              className="flex flex-col items-center justify-center gap-4 p-6 bg-gray-50 hover:bg-gray-100 transition-colors rounded"
             >
-              {brand.logoUrl ? (
-                <div className="relative w-20 h-12">
-                  <Image
-                    src={brand.logoUrl}
-                    alt={brand.name}
-                    fill
-                    className="object-contain"
-                    sizes="80px"
-                  />
-                </div>
-              ) : (
-                <div className="w-20 h-12 flex items-center justify-center">
-                  <span className="text-sm font-semibold uppercase tracking-wider text-gray-700">{brand.name}</span>
-                </div>
-              )}
-              <p className="text-[11px] uppercase tracking-widest text-gray-400">{brand.name}</p>
+              <div className="relative w-full h-20">
+                <Image
+                  src={brand.logoUrl}
+                  alt={brand.name}
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
+              </div>
+              <p className="text-[11px] uppercase tracking-widest text-gray-500 text-center">{brand.name}</p>
             </div>
           ))}
         </div>

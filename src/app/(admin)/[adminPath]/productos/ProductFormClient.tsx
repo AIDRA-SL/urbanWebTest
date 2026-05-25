@@ -1,16 +1,16 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { ImageCropModal } from '@/components/ui/ImageCropModal'
-import Image from 'next/image'
 import { X, Upload, Video } from 'lucide-react'
 
 interface Category {
   id: string
   name: string
+  slug: string
   parentId: string | null
 }
 
@@ -23,7 +23,7 @@ interface ProductData {
   sku?: string | null
   isActive?: boolean
   isFeatured?: boolean
-  categories?: { id: string }[]
+  categories?: { id: string; slug: string }[]
   images?: { id: string; url: string; isPrimary: boolean }[]
   videos?: { id?: string; url: string }[]
   variants?: { id?: string; size?: string | null; color?: string | null; stock?: number }[]
@@ -35,7 +35,22 @@ interface Props {
   product?: ProductData
 }
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+type SizeMode = 'ropa' | 'calzado' | 'unica' | 'sin-talla'
+
+const CLOTHING_SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
+const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47']
+
+function detectSizeMode(
+  selectedCats: string[],
+  categories: Category[],
+  variants: { size: string; stock: number }[]
+): SizeMode {
+  if (variants.length === 1 && variants[0].size === 'Única') return 'unica'
+  if (variants.length === 0) return 'sin-talla'
+  const slugs = categories.filter(c => selectedCats.includes(c.id)).map(c => c.slug)
+  const isShoes = slugs.some(s => s.includes('zapati') || s.includes('calzado'))
+  return isShoes ? 'calzado' : 'ropa'
+}
 
 export function ProductFormClient({ categories, adminPath, product }: Props) {
   const router = useRouter()
@@ -60,36 +75,89 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  // Size mode: auto-detect on mount, then user can override
+  const [sizeMode, setSizeMode] = useState<SizeMode>(() =>
+    detectSizeMode(
+      product?.categories?.map(c => c.id) ?? [],
+      categories,
+      product?.variants?.filter(v => v.size).map(v => ({ size: v.size!, stock: v.stock ?? 0 })) ?? []
+    )
+  )
+
+  // Auto-adjust mode when categories change (only if user hasn't manually chosen calzado/ropa)
+  useEffect(() => {
+    if (sizeMode === 'unica' || sizeMode === 'sin-talla') return
+    const slugs = categories.filter(c => selectedCats.includes(c.id)).map(c => c.slug)
+    const isShoes = slugs.some(s => s.includes('zapati') || s.includes('calzado'))
+    setSizeMode(isShoes ? 'calzado' : 'ropa')
+  }, [selectedCats]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSizeModeChange = (mode: SizeMode) => {
+    setSizeMode(mode)
+    if (mode === 'unica') {
+      setVariants([{ size: 'Única', stock: 10 }])
+    } else if (mode === 'sin-talla') {
+      setVariants([])
+    } else {
+      // Reset variants that don't belong to the new mode
+      const validSizes = mode === 'calzado' ? SHOE_SIZES : CLOTHING_SIZES
+      setVariants(prev => prev.filter(v => validSizes.includes(v.size)))
+    }
+  }
+
   // Crop queue state
   const [cropQueue, setCropQueue] = useState<File[]>([])
   const [cropSrc, setCropSrc] = useState<string | null>(null)
   const [cropOriginalTotal, setCropOriginalTotal] = useState(0)
 
-  const uploadBlob = useCallback(async (blob: Blob) => {
+  // Converts any image File to a JPEG Blob via canvas (same as the crop path)
+  const fileToJpegBlob = (file: File): Promise<Blob> =>
+    new Promise((resolve, reject) => {
+      const img = new window.Image()
+      const url = URL.createObjectURL(file)
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = img.naturalWidth
+        canvas.height = img.naturalHeight
+        const ctx = canvas.getContext('2d')
+        if (!ctx) { URL.revokeObjectURL(url); reject(new Error('no ctx')); return }
+        ctx.drawImage(img, 0, 0)
+        canvas.toBlob(blob => {
+          URL.revokeObjectURL(url)
+          blob ? resolve(blob) : reject(new Error('toBlob failed'))
+        }, 'image/jpeg', 0.92)
+      }
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('load failed')) }
+      img.src = url
+    })
+
+  const uploadBlob = useCallback(async (blob: Blob): Promise<boolean> => {
     setUploading(true)
     try {
       const fd = new FormData()
-      fd.append('file', blob, 'product.jpg')
+      fd.append('file', new File([blob], 'product.jpg', { type: blob.type || 'image/jpeg' }))
       fd.append('subfolder', 'products')
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const data = await res.json()
       if (data.url) {
         setImages((prev) => [...prev, { url: data.url, isPrimary: prev.length === 0 }])
+        return true
       }
+      return false
+    } catch {
+      return false
     } finally {
       setUploading(false)
     }
   }, [])
 
-  const advanceCropQueue = useCallback((remaining: File[]) => {
-    setCropQueue(remaining)
-    if (cropSrc) URL.revokeObjectURL(cropSrc)
-    if (remaining.length > 0) {
-      setCropSrc(URL.createObjectURL(remaining[0]))
-    } else {
-      setCropSrc(null)
+  const handleDirectUpload = async (files: FileList | null) => {
+    if (!files?.length) return
+    for (const file of Array.from(files)) {
+      const blob = await fileToJpegBlob(file)
+      await uploadBlob(blob)
     }
-  }, [cropSrc])
+  }
 
   const handleFileSelect = (files: FileList | null) => {
     if (!files?.length) return
@@ -101,16 +169,35 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
 
   const handleCropConfirm = async (blob: Blob) => {
     await uploadBlob(blob)
-    advanceCropQueue(cropQueue.slice(1))
+    const remaining = cropQueue.slice(1)
+    if (cropSrc) URL.revokeObjectURL(cropSrc)
+    setCropQueue(remaining)
+    setCropSrc(remaining.length > 0 ? URL.createObjectURL(remaining[0]) : null)
   }
 
   const handleCropSkip = async (file: File) => {
-    await uploadBlob(file)
-    advanceCropQueue(cropQueue.slice(1))
+    try {
+      const blob = await fileToJpegBlob(file)
+      const ok = await uploadBlob(blob)
+      if (!ok) {
+        setError('No se pudo subir la imagen')
+      }
+    } catch {
+      const ALLOWED = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (ALLOWED.includes(file.type)) {
+        await uploadBlob(file)
+      } else {
+        setError('No se pudo procesar la imagen')
+      }
+    } finally {
+      const remaining = cropQueue.slice(1)
+      if (cropSrc) URL.revokeObjectURL(cropSrc)
+      setCropQueue(remaining)
+      setCropSrc(remaining.length > 0 ? URL.createObjectURL(remaining[0]) : null)
+    }
   }
 
   const handleCropCancel = () => {
-    // Cancel all remaining images in queue
     if (cropSrc) URL.revokeObjectURL(cropSrc)
     setCropSrc(null)
     setCropQueue([])
@@ -164,6 +251,8 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
     }
   }
 
+  const availableSizes = sizeMode === 'calzado' ? SHOE_SIZES : CLOTHING_SIZES
+
   return (
     <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Main fields */}
@@ -190,11 +279,12 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
         {/* Images */}
         <div className="bg-white border border-gray-100 p-6">
           <h3 className="text-xs uppercase tracking-widest text-gray-500 mb-1">Imágenes</h3>
-          <p className="text-[11px] text-gray-400 mb-4">Recomendado: 800×800 px mínimo · Ideal 1000×1000 px · Formato cuadrado (1:1)</p>
+          <p className="text-[11px] text-gray-400 mb-4">Cualquier formato aceptado · Fondo blanco recomendado · Mínimo 800 px de ancho</p>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
             {images.map((img, i) => (
-              <div key={i} className="relative aspect-square bg-gray-100 overflow-hidden">
-                <Image src={img.url} alt="" fill className="object-cover" />
+              <div key={i} className="relative bg-white border border-gray-100 overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img.url} alt="" className="w-full h-auto block" />
                 <button
                   type="button"
                   onClick={() => setImages((prev) => prev.filter((_, j) => j !== i))}
@@ -207,18 +297,31 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
                 )}
               </div>
             ))}
-            <label className="aspect-square border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 transition-colors">
+            <div className="min-h-[80px] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-gray-400 transition-colors">
               <Upload size={16} className="text-gray-400 mb-1" />
-              <span className="text-xs text-gray-400">Subir</span>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onClick={(e) => { (e.target as HTMLInputElement).value = '' }}
-                onChange={(e) => handleFileSelect(e.target.files)}
-              />
-            </label>
+              <label className="text-xs text-gray-400 cursor-pointer hover:text-gray-600">
+                Subir
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onClick={(e) => { (e.target as HTMLInputElement).value = '' }}
+                  onChange={(e) => handleDirectUpload(e.target.files)}
+                />
+              </label>
+              <label className="text-[10px] text-gray-300 cursor-pointer hover:text-gray-400 mt-0.5 underline underline-offset-2">
+                con recorte
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onClick={(e) => { (e.target as HTMLInputElement).value = '' }}
+                  onChange={(e) => handleFileSelect(e.target.files)}
+                />
+              </label>
+            </div>
           </div>
           {uploading && <p className="text-xs text-gray-400">Subiendo imagen…</p>}
         </div>
@@ -231,7 +334,6 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
           </div>
           <p className="text-[11px] text-gray-400">Acepta enlaces de YouTube (recomendado), Instagram Reels y TikTok.</p>
 
-          {/* Upload MP4 */}
           <div>
             <label className={`inline-flex items-center gap-2 px-3 py-2 border border-gray-200 text-xs cursor-pointer hover:border-gray-400 transition-colors ${uploadingVideo ? 'opacity-50 pointer-events-none' : ''}`}>
               <Upload size={12} className="text-gray-500" />
@@ -261,7 +363,6 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
             </label>
           </div>
 
-          {/* URL input (YouTube) */}
           <div className="flex gap-2">
             <input
               type="url"
@@ -295,7 +396,6 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
             </button>
           </div>
 
-          {/* Video list */}
           {videos.length > 0 && (
             <div className="flex flex-col gap-2">
               {videos.map((v, i) => (
@@ -329,37 +429,85 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
         {/* Variants / Sizes */}
         <div className="bg-white border border-gray-100 p-6">
           <h3 className="text-xs uppercase tracking-widest text-gray-500 mb-4">Tallas y stock</h3>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {SIZES.map((size) => {
-              const v = variants.find((x) => x.size === size)
-              return (
-                <button
-                  key={size}
-                  type="button"
-                  onClick={() => toggleVariantSize(size)}
-                  className={`px-3 py-1.5 text-xs border transition-colors ${v ? 'border-black bg-black text-white' : 'border-gray-200 hover:border-gray-400'}`}
-                >
-                  {size}
-                </button>
-              )
-            })}
+
+          {/* Mode selector */}
+          <div className="flex items-center gap-3 mb-5">
+            <label className="text-xs text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              Tipo de prenda
+            </label>
+            <select
+              value={sizeMode}
+              onChange={(e) => handleSizeModeChange(e.target.value as SizeMode)}
+              className="border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:border-black transition-colors"
+            >
+              <option value="ropa">Ropa (XXS – XXL)</option>
+              <option value="calzado">Calzado (35 – 47)</option>
+              <option value="unica">Talla única</option>
+              <option value="sin-talla">Sin talla / Accesorio</option>
+            </select>
           </div>
-          {variants.length > 0 && (
-            <div className="flex flex-col gap-2">
-              {variants.map((v) => (
-                <div key={v.size} className="flex items-center gap-3">
-                  <span className="text-xs font-medium w-10">{v.size}</span>
-                  <input
-                    type="number"
-                    min="0"
-                    value={v.stock}
-                    onChange={(e) => setVariants((prev) => prev.map((x) => x.size === v.size ? { ...x, stock: parseInt(e.target.value) || 0 } : x))}
-                    className="w-20 border border-gray-200 px-2 py-1 text-sm focus:outline-none focus:border-black"
-                  />
-                  <span className="text-xs text-gray-400">unidades</span>
+
+          {/* Size grid */}
+          {(sizeMode === 'ropa' || sizeMode === 'calzado') && (
+            <>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {availableSizes.map((size) => {
+                  const v = variants.find((x) => x.size === size)
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => toggleVariantSize(size)}
+                      className={`px-3 py-1.5 text-xs border transition-colors ${
+                        v ? 'border-black bg-black text-white' : 'border-gray-200 hover:border-gray-400'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  )
+                })}
+              </div>
+              {variants.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {variants.map((v) => (
+                    <div key={v.size} className="flex items-center gap-3">
+                      <span className="text-xs font-medium w-12">{v.size}</span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={v.stock}
+                        onChange={(e) => setVariants((prev) =>
+                          prev.map((x) => x.size === v.size ? { ...x, stock: parseInt(e.target.value) || 0 } : x)
+                        )}
+                        className="w-20 border border-gray-200 px-2 py-1 text-sm focus:outline-none focus:border-black"
+                      />
+                      <span className="text-xs text-gray-400">unidades</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+              {variants.length === 0 && (
+                <p className="text-xs text-gray-400">Selecciona las tallas disponibles arriba.</p>
+              )}
+            </>
+          )}
+
+          {sizeMode === 'unica' && (
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-medium w-16 text-gray-700">Talla única</span>
+              <input
+                type="number"
+                min="0"
+                value={variants[0]?.stock ?? 10}
+                onChange={(e) => setVariants([{ size: 'Única', stock: parseInt(e.target.value) || 0 }])}
+                className="w-20 border border-gray-200 px-2 py-1 text-sm focus:outline-none focus:border-black"
+              />
+              <span className="text-xs text-gray-400">unidades</span>
             </div>
+          )}
+
+          {sizeMode === 'sin-talla' && (
+            <p className="text-xs text-gray-400">El producto no tiene talla (accesorios, complementos…)</p>
           )}
         </div>
       </div>
@@ -386,7 +534,9 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
                 <input
                   type="checkbox"
                   checked={selectedCats.includes(cat.id)}
-                  onChange={(e) => setSelectedCats((prev) => e.target.checked ? [...prev, cat.id] : prev.filter((id) => id !== cat.id))}
+                  onChange={(e) => setSelectedCats((prev) =>
+                    e.target.checked ? [...prev, cat.id] : prev.filter((id) => id !== cat.id)
+                  )}
                   className="w-3.5 h-3.5"
                 />
                 <span className={`text-sm ${cat.parentId ? 'pl-3 text-gray-500 text-xs' : ''}`}>{cat.name}</span>

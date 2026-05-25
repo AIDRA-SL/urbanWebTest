@@ -19,7 +19,7 @@ export default async function EditProductPage({ params }: Props) {
       images: { orderBy: { sortOrder: 'asc' } },
       videos: { orderBy: { sortOrder: 'asc' } },
       variants: true,
-      categories: { select: { id: true, name: true } },
+      categories: { select: { id: true, name: true, slug: true } },
     },
   })
 
@@ -28,7 +28,7 @@ export default async function EditProductPage({ params }: Props) {
   const categories = await prisma.category.findMany({
     where: { isActive: true },
     orderBy: { name: 'asc' },
-    select: { id: true, name: true, parentId: true },
+    select: { id: true, name: true, slug: true, parentId: true },
   })
 
   return (

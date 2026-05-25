@@ -122,12 +122,13 @@ export function BrandsClient({ brands }: Props) {
               key={brand.id}
               className={`bg-white border p-4 flex flex-col gap-3 ${brand.isActive ? 'border-gray-200' : 'border-gray-100 opacity-60'}`}
             >
-              <div className="relative h-20 bg-gray-50 flex items-center justify-center overflow-hidden">
+              <div className="relative h-20 w-full bg-gray-50 flex items-center justify-center overflow-hidden">
                 <Image
                   src={brand.logoUrl}
                   alt={brand.name}
                   fill
-                  className="object-contain p-2"
+                  unoptimized
+                  className="object-contain p-3"
                 />
               </div>
               <p className="text-sm font-medium text-center truncate">{brand.name}</p>
@@ -168,7 +169,7 @@ export function BrandsClient({ brands }: Props) {
 
             {logoUrl ? (
               <div className="relative h-24 bg-gray-50 overflow-hidden flex items-center justify-center">
-                <Image src={logoUrl} alt="Preview" fill className="object-contain p-2" />
+                <Image src={logoUrl} alt="Preview" fill unoptimized className="object-contain p-2" />
                 <button
                   type="button"
                   onClick={() => setLogoUrl('')}

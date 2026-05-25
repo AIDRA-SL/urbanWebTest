@@ -14,7 +14,7 @@ export default async function NewProductPage({ params }: Props) {
   const categories = await prisma.category.findMany({
     where: { isActive: true },
     orderBy: { name: 'asc' },
-    select: { id: true, name: true, parentId: true },
+    select: { id: true, name: true, slug: true, parentId: true },
   })
 
   return (
