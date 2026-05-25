@@ -39,7 +39,7 @@ export function AddToCartButton({
   const [added, setAdded] = useState(false)
 
   const selectedVariant = selectedVariantId ? variants.find((v) => v.id === selectedVariantId) : null
-  const outOfStock = selectedVariant ? selectedVariant.stock <= 0 : variants.length > 0 && variants.every((v) => v.stock <= 0)
+  const outOfStock = selectedVariant ? selectedVariant.stock <= 0 : variants.length === 0 || variants.every((v) => v.stock <= 0)
   const needsSize = variants.some((v) => v.size) && !selectedVariantId && variants.length > 0
 
   const handleAdd = () => {

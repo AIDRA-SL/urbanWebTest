@@ -26,7 +26,7 @@ export function ProductCard({ product, badges, priority = false }: Props) {
   const hasSizes = variants.some((v) => v.size !== null)
   const availableSizes = hasSizes ? variants.filter((v) => v.size !== null && v.stock > 0) : []
   const singleVariant = !hasSizes && variants.length === 1 ? variants[0] : null
-  const isTotallyOutOfStock = variants.length > 0 && variants.every((v) => v.stock <= 0)
+  const isTotallyOutOfStock = variants.length === 0 || variants.every((v) => v.stock <= 0)
 
   const [isHovered, setIsHovered] = useState(false)
   const [selectedVariant, setSelectedVariant] = useState<{ id: string; size: string | null } | null>(null)

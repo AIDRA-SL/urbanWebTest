@@ -47,11 +47,11 @@ export function ProductDetailClient({ product }: Props) {
   const hasSizes = product.variants.some((v) => v.size)
   const inStockVariants = product.variants.filter((v) => v.stock > 0)
 
-  // Auto-seleccionar si solo hay una variante con stock (accesorios con "Única", etc.)
+  // Auto-seleccionar si solo hay una variante (con o sin stock), para que el estado sea siempre coherente
   useEffect(() => {
-    if (inStockVariants.length === 1 && !selectedVariantId) {
-      setSelectedVariantId(inStockVariants[0].id)
-      setSelectedSize(inStockVariants[0].size)
+    if (!selectedVariantId && product.variants.length === 1) {
+      setSelectedVariantId(product.variants[0].id)
+      setSelectedSize(product.variants[0].size)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -98,7 +98,7 @@ export function ProductDetailClient({ product }: Props) {
       )}
 
       {/* Quantity selector */}
-      {showQtySelector && (maxQty > 0 || !hasSizes) && (
+      {showQtySelector && maxQty > 0 && (
         <div className="flex items-center gap-4">
           <span className="text-xs uppercase tracking-wider text-gray-500">Cantidad</span>
           <div className="flex items-center border border-gray-200">
