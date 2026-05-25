@@ -36,7 +36,7 @@ export function ProductCard({ product, badges, priority = false }: Props) {
     router.push(`/productos/${product.slug}`)
   }
 
-  const handleSizeClick = (e: React.MouseEvent, variant: { id: string; size: string | null }) => {
+  const handleSizeClick = (e: React.MouseEvent, variant: { id: string; size: string | null; stock: number }) => {
     e.stopPropagation()
     add({
       productId: product.id,
@@ -47,6 +47,7 @@ export function ProductCard({ product, badges, priority = false }: Props) {
       size: variant.size ?? undefined,
       quantity: 1,
       slug: product.slug,
+      maxStock: variant.stock,
     })
     trackEvent({ type: 'ADD_TO_CART', productId: product.id })
     setSelectedVariant(variant)
@@ -67,6 +68,7 @@ export function ProductCard({ product, badges, priority = false }: Props) {
       imageUrl: primaryImg?.url ?? '',
       quantity: 1,
       slug: product.slug,
+      maxStock: singleVariant?.stock,
     })
     trackEvent({ type: 'ADD_TO_CART', productId: product.id })
     setAdded(true)

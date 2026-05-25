@@ -205,7 +205,11 @@ export function CartPageClient() {
                       <div className="flex items-center border border-gray-200">
                         <button className="px-2 py-1 text-sm" onClick={() => updateQty(item.productId, item.variantId, item.quantity - 1)}>−</button>
                         <span className="px-3 text-sm">{item.quantity}</span>
-                        <button className="px-2 py-1 text-sm" onClick={() => updateQty(item.productId, item.variantId, item.quantity + 1)}>+</button>
+                        <button
+                          className="px-2 py-1 text-sm disabled:opacity-30 transition-opacity"
+                          disabled={item.maxStock !== undefined && item.quantity >= item.maxStock}
+                          onClick={() => updateQty(item.productId, item.variantId, item.quantity + 1)}
+                        >+</button>
                       </div>
                       <span className="text-sm font-medium">{formatPrice(item.price * item.quantity)}</span>
                     </div>

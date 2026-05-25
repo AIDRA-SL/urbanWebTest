@@ -41,6 +41,9 @@ export function AddToCartButton({
   const selectedVariant = selectedVariantId ? variants.find((v) => v.id === selectedVariantId) : null
   const outOfStock = selectedVariant ? selectedVariant.stock <= 0 : variants.length === 0 || variants.every((v) => v.stock <= 0)
   const needsSize = variants.some((v) => v.size) && !selectedVariantId && variants.length > 0
+  const maxStock = selectedVariant
+    ? selectedVariant.stock
+    : variants.reduce((sum, v) => sum + v.stock, 0)
 
   const handleAdd = () => {
     if (needsSize || outOfStock) return
@@ -54,6 +57,7 @@ export function AddToCartButton({
       size: selectedSize ?? undefined,
       quantity,
       slug,
+      maxStock,
     })
 
     trackEvent({ type: 'ADD_TO_CART', productId })
