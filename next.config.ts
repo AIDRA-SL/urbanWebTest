@@ -32,6 +32,20 @@ const nextConfig: NextConfig = {
       { pathname: '/*.webp', search: '' },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/accesorios',
+        destination: '/categoria/complementos',
+        permanent: true,
+      },
+      {
+        source: '/accesorios/',
+        destination: '/categoria/complementos',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {

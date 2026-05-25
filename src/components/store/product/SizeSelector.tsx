@@ -14,7 +14,7 @@ interface Props {
 }
 
 export function SizeSelector({ variants, selected, onSelect }: Props) {
-  const sizeVariants = variants.filter((v) => v.size && v.stock > 0)
+  const sizeVariants = variants.filter((v) => v.size)
   if (sizeVariants.length === 0) return null
 
   return (
@@ -28,19 +28,29 @@ export function SizeSelector({ variants, selected, onSelect }: Props) {
       <div className="flex flex-wrap gap-2">
         {sizeVariants.map((variant) => {
           const isSelected = selected === variant.id
+          const outOfStock = variant.stock <= 0
 
           return (
             <button
               key={variant.id}
-              onClick={() => onSelect(variant.id, variant.size)}
+              onClick={() => !outOfStock && onSelect(variant.id, variant.size)}
+              disabled={outOfStock}
+              title={outOfStock ? 'Sin stock' : undefined}
               className={[
-                'min-w-[44px] h-11 px-3 text-sm border transition-all duration-150',
+                'relative min-w-[44px] h-11 px-3 text-sm border transition-all duration-150',
                 isSelected
                   ? 'border-black bg-black text-white'
+                  : outOfStock
+                  ? 'border-gray-100 text-gray-300 cursor-not-allowed'
                   : 'border-gray-200 hover:border-black',
               ].join(' ')}
             >
               {variant.size}
+              {outOfStock && (
+                <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <span className="absolute w-full h-px bg-gray-200 rotate-[-30deg]" />
+                </span>
+              )}
             </button>
           )
         })}

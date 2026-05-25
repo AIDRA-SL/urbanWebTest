@@ -21,6 +21,7 @@ interface Props {
   variants: Variant[]
   selectedSize: string | null
   selectedVariantId: string | undefined
+  quantity?: number
 }
 
 export function AddToCartButton({
@@ -32,6 +33,7 @@ export function AddToCartButton({
   variants,
   selectedSize,
   selectedVariantId,
+  quantity = 1,
 }: Props) {
   const add = useCartStore((s) => s.add)
   const [added, setAdded] = useState(false)
@@ -50,7 +52,7 @@ export function AddToCartButton({
       price,
       imageUrl,
       size: selectedSize ?? undefined,
-      quantity: 1,
+      quantity,
       slug,
     })
 
