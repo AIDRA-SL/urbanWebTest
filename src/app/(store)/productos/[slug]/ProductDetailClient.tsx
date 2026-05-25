@@ -39,16 +39,14 @@ export function ProductDetailClient({ product }: Props) {
     ? product.variants.find((v) => v.id === selectedVariantId)
     : null
 
-  // For products with no sizes, use the single variant or check all variants
   const effectiveVariant =
     selectedVariant ??
     (product.variants.length === 1 ? product.variants[0] : null)
 
-  const availableStock = effectiveVariant?.stock ?? 0
   const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0)
   const hasSizes = product.variants.some((v) => v.size)
 
-  // Stock label to show
+  // Stock label — solo informativo
   const stockLabel = (() => {
     if (hasSizes && !selectedVariantId) return null
     const stock = effectiveVariant?.stock ?? totalStock
@@ -58,12 +56,15 @@ export function ProductDetailClient({ product }: Props) {
     return { text: 'En stock', color: 'text-green-600' }
   })()
 
-  const maxQty = hasSizes ? (selectedVariant?.stock ?? 0) : totalStock
-  const clampedQty = Math.min(quantity, maxQty || 1)
+  // El selector nunca se bloquea por stock — el stock es solo informativo
+  const MAX_QTY = 99
 
   function changeQty(delta: number) {
-    setQuantity((q) => Math.max(1, Math.min(q + delta, maxQty || 99)))
+    setQuantity((q) => Math.max(1, Math.min(q + delta, MAX_QTY)))
   }
+
+  // Mostrar el selector solo cuando haya una variante activa o no se usen tallas
+  const showQtySelector = !hasSizes || !!selectedVariantId
 
   // Reset quantity when variant changes
   useEffect(() => {
@@ -81,7 +82,7 @@ export function ProductDetailClient({ product }: Props) {
         }}
       />
 
-      {/* Stock info */}
+      {/* Stock info — solo informativo */}
       {stockLabel && (
         <p className={`text-sm font-medium ${stockLabel.color}`}>
           {stockLabel.text}
@@ -89,24 +90,24 @@ export function ProductDetailClient({ product }: Props) {
       )}
 
       {/* Quantity selector */}
-      {(maxQty > 0 || !hasSizes) && (
+      {showQtySelector && (
         <div className="flex items-center gap-4">
           <span className="text-xs uppercase tracking-wider text-gray-500">Cantidad</span>
           <div className="flex items-center border border-gray-200">
             <button
               onClick={() => changeQty(-1)}
-              disabled={clampedQty <= 1}
+              disabled={quantity <= 1}
               className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 disabled:opacity-30 transition-colors"
               aria-label="Disminuir cantidad"
             >
               <Minus size={14} />
             </button>
             <span className="w-10 h-10 flex items-center justify-center text-sm font-medium select-none">
-              {clampedQty}
+              {quantity}
             </span>
             <button
               onClick={() => changeQty(1)}
-              disabled={maxQty > 0 && clampedQty >= maxQty}
+              disabled={quantity >= MAX_QTY}
               className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 disabled:opacity-30 transition-colors"
               aria-label="Aumentar cantidad"
             >
@@ -125,7 +126,7 @@ export function ProductDetailClient({ product }: Props) {
         variants={product.variants}
         selectedSize={selectedSize}
         selectedVariantId={selectedVariantId}
-        quantity={clampedQty}
+        quantity={quantity}
       />
     </>
   )
