@@ -40,13 +40,21 @@ type SizeMode = 'ropa' | 'calzado' | 'unica' | 'sin-talla'
 const CLOTHING_SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47']
 
+function parseInitialVariants(productVariants?: ProductData['variants']): { size: string | null; stock: number }[] {
+  if (!productVariants?.length) return []
+  if (productVariants.length === 1 && !productVariants[0].size) {
+    return [{ size: null, stock: productVariants[0].stock ?? 0 }]
+  }
+  return productVariants.filter((v) => v.size).map((v) => ({ size: v.size!, stock: v.stock ?? 0 }))
+}
+
 function detectSizeMode(
   selectedCats: string[],
   categories: Category[],
-  variants: { size: string; stock: number }[]
+  variants: { size: string | null; stock: number }[]
 ): SizeMode {
   if (variants.length === 1 && variants[0].size === 'Única') return 'unica'
-  if (variants.length === 0) return 'sin-talla'
+  if (variants.length === 0 || (variants.length === 1 && variants[0].size === null)) return 'sin-talla'
   const slugs = categories.filter(c => selectedCats.includes(c.id)).map(c => c.slug)
   const isShoes = slugs.some(s => s.includes('zapati') || s.includes('calzado'))
   return isShoes ? 'calzado' : 'ropa'
@@ -65,8 +73,8 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
   const [isFeatured, setIsFeatured] = useState(product?.isFeatured ?? false)
   const [selectedCats, setSelectedCats] = useState<string[]>(product?.categories?.map((c) => c.id) ?? [])
   const [images, setImages] = useState<{ url: string; isPrimary: boolean }[]>(product?.images ?? [])
-  const [variants, setVariants] = useState<{ size: string; stock: number }[]>(
-    product?.variants?.filter((v) => v.size).map((v) => ({ size: v.size!, stock: v.stock ?? 0 })) ?? []
+  const [variants, setVariants] = useState<{ size: string | null; stock: number }[]>(
+    parseInitialVariants(product?.variants)
   )
   const [videos, setVideos] = useState<{ url: string }[]>(product?.videos?.map((v) => ({ url: v.url })) ?? [])
   const [videoInput, setVideoInput] = useState('')
@@ -80,7 +88,7 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
     detectSizeMode(
       product?.categories?.map(c => c.id) ?? [],
       categories,
-      product?.variants?.filter(v => v.size).map(v => ({ size: v.size!, stock: v.stock ?? 0 })) ?? []
+      parseInitialVariants(product?.variants)
     )
   )
 
@@ -97,11 +105,11 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
     if (mode === 'unica') {
       setVariants([{ size: 'Única', stock: 10 }])
     } else if (mode === 'sin-talla') {
-      setVariants([])
+      setVariants([{ size: null, stock: 0 }])
     } else {
       // Reset variants that don't belong to the new mode
       const validSizes = mode === 'calzado' ? SHOE_SIZES : CLOTHING_SIZES
-      setVariants(prev => prev.filter(v => validSizes.includes(v.size)))
+      setVariants(prev => prev.filter(v => v.size !== null && validSizes.includes(v.size)))
     }
   }
 
@@ -507,7 +515,20 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
           )}
 
           {sizeMode === 'sin-talla' && (
-            <p className="text-xs text-gray-400">El producto no tiene talla (accesorios, complementos…)</p>
+            <div className="space-y-2">
+              <p className="text-xs text-gray-400 mb-3">El producto no tiene talla (accesorios, complementos…)</p>
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-medium w-16 text-gray-700">Stock</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={variants[0]?.stock ?? 0}
+                  onChange={(e) => setVariants([{ size: null, stock: parseInt(e.target.value) || 0 }])}
+                  className="w-20 border border-gray-200 px-2 py-1 text-sm focus:outline-none focus:border-black"
+                />
+                <span className="text-xs text-gray-400">unidades</span>
+              </div>
+            </div>
           )}
         </div>
       </div>

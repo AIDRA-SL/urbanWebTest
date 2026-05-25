@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { formatPrice } from '@/lib/utils'
-import { Edit, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Edit, Trash2, Eye, EyeOff, Search, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface Product {
@@ -29,6 +29,18 @@ export function ProductsTableClient({ products, adminPath }: Props) {
   const router = useRouter()
   const [deleting, setDeleting] = useState<string | null>(null)
   const [toggling, setToggling] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+
+  const filtered = search.trim()
+    ? products.filter((p) => {
+        const q = search.toLowerCase()
+        return (
+          p.name.toLowerCase().includes(q) ||
+          (p.sku?.toLowerCase().includes(q) ?? false) ||
+          p.categories.some((c) => c.name.toLowerCase().includes(q))
+        )
+      })
+    : products
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`¿Eliminar "${name}"? Esta acción no se puede deshacer.`)) return
@@ -50,6 +62,27 @@ export function ProductsTableClient({ products, adminPath }: Props) {
   }
 
   return (
+    <div className="space-y-3">
+      {/* Search bar */}
+      <div className="relative">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar por nombre, SKU o categoría…"
+          className="w-full border border-gray-200 pl-9 pr-8 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:border-black transition-colors bg-white"
+        />
+        {search && (
+          <button
+            onClick={() => setSearch('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+          >
+            <X size={13} />
+          </button>
+        )}
+      </div>
+
     <div className="bg-white border border-gray-100 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -64,7 +97,7 @@ export function ProductsTableClient({ products, adminPath }: Props) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {products.map((product) => (
+            {filtered.map((product) => (
               <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3">
                   {product.images[0] ? (
@@ -117,12 +150,17 @@ export function ProductsTableClient({ products, adminPath }: Props) {
           </tbody>
         </table>
 
-        {products.length === 0 && (
+        {filtered.length === 0 && (
           <div className="py-16 text-center">
-            <p className="text-sm text-gray-400">No hay productos. Crea el primero.</p>
+            {search ? (
+              <p className="text-sm text-gray-400">Sin resultados para &quot;{search}&quot;</p>
+            ) : (
+              <p className="text-sm text-gray-400">No hay productos. Crea el primero.</p>
+            )}
           </div>
         )}
       </div>
+    </div>
     </div>
   )
 }
