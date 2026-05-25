@@ -94,7 +94,7 @@ export function ProductCard({ product, badges, priority = false }: Props) {
               src={primaryImg.url}
               alt={primaryImg.altText ?? product.name}
               fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              className="object-contain transition-transform duration-700 ease-out group-hover:scale-105"
               sizes="(max-width: 640px) 50vw, (max-width: 1280px) 25vw, 20vw"
               priority={priority}
             />
