@@ -18,6 +18,18 @@ export default function ContactoPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Contact info */}
         <div className="flex flex-col gap-4">
+          <div className="overflow-hidden border border-gray-100 h-48">
+            <iframe
+              src="https://maps.google.com/maps?q=Calle+Nueve+de+Mayo+15%2C+33002+Oviedo%2C+Asturias&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Ubicación de la tienda"
+            />
+          </div>
           <div className="flex gap-4 p-6 bg-gray-50 border border-gray-100">
             <MapPin size={18} className="shrink-0 mt-0.5 text-gray-400" />
             <div>

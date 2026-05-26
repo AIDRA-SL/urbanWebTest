@@ -93,6 +93,7 @@ async function main() {
     { name: 'Jerseys', slug: 'mujer-jerseys', p: 'mujer', o: 11 },
     { name: 'Bolsos', slug: 'bolsos', p: 'complementos', o: 0 },
     { name: 'Cinturones', slug: 'cinturones', p: 'complementos', o: 1 },
+    { name: 'Otros', slug: 'complementos-otros', p: 'complementos', o: 2 },
     { name: 'Hombre', slug: 'rebajas-hombre', p: 'rebajas', o: 0 },
     { name: 'Mujer', slug: 'rebajas-mujer', p: 'rebajas', o: 1 },
   ]

@@ -54,6 +54,19 @@ export default function ContactoPage() {
           </div>
         </div>
 
+        <div className="overflow-hidden border border-gray-100 h-48 mb-6">
+          <iframe
+            src="https://maps.google.com/maps?q=Calle+Nueve+de+Mayo+15%2C+33002+Oviedo%2C+Asturias&t=&z=16&ie=UTF8&iwloc=&output=embed"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Ubicación de la tienda"
+          />
+        </div>
+
         <div className="p-6 bg-gray-50 border border-gray-100">
           <p className="text-sm font-semibold uppercase tracking-wider mb-1">WhatsApp</p>
           <p className="text-sm text-gray-500 mb-4">¿Prefieres escribirnos directamente? Estamos disponibles en WhatsApp en horario de tienda.</p>

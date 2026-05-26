@@ -38,9 +38,9 @@ const SUBCAT_SLUGS: Record<string, string> = {
   'vestidos': 'vestidos',
   'bolsos': 'bolsos',
   'cinturones': 'cinturones',
-  'accesorios': 'complementos',
-  'gafas': 'complementos',
-  'complementos': 'complementos',
+  'accesorios': 'complementos-otros',
+  'gafas': 'complementos-otros',
+  'complementos': 'complementos-otros',
 }
 
 const BADGE_COLORS: Record<string, string> = {
@@ -65,7 +65,7 @@ function mapCategoriesToSlugs(scrapedCats: string[]): string[] {
     if (cat === 'hombre' || cat === 'mujer') continue
     const sub = SUBCAT_SLUGS[cat]
     if (!sub) continue
-    if (sub === 'bolsos' || sub === 'cinturones' || sub === 'complementos') {
+    if (sub === 'bolsos' || sub === 'cinturones' || sub === 'complementos-otros') {
       slugs.push('complementos')
       if (sub !== 'complementos') slugs.push(sub)
     } else if (sub === 'zapatillas') {
