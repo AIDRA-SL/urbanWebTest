@@ -67,7 +67,7 @@ function mapCategoriesToSlugs(scrapedCats: string[]): string[] {
     if (!sub) continue
     if (sub === 'bolsos' || sub === 'cinturones' || sub === 'complementos-otros') {
       slugs.push('complementos')
-      if (sub !== 'complementos') slugs.push(sub)
+      slugs.push(sub)
     } else if (sub === 'zapatillas') {
       slugs.push('calzado')
       if (gender) {
