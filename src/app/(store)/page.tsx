@@ -103,8 +103,8 @@ export default async function HomePage() {
       <CategoryBanner categories={categories} />
       <FeaturedProducts products={featuredProducts} />
       <ReviewsCarousel />
-      <TrustSection />
       <BrandsSection brands={brands} />
+      <TrustSection />
     </>
   )
 }
