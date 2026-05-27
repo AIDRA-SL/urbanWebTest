@@ -11,10 +11,9 @@ interface Props {
 
 export default async function NewProductPage({ params }: Props) {
   const { adminPath } = await params
-  const [categories, brands] = await Promise.all([
+  const [rawCategories, brands] = await Promise.all([
     prisma.category.findMany({
       where: { isActive: true, NOT: { slug: { startsWith: 'marcas' } } },
-      orderBy: { name: 'asc' },
       select: { id: true, name: true, slug: true, parentId: true },
     }),
     prisma.brand.findMany({
@@ -23,6 +22,9 @@ export default async function NewProductPage({ params }: Props) {
       select: { id: true, name: true },
     }),
   ])
+  const roots = rawCategories.filter(c => !c.parentId).sort((a, b) => a.name.localeCompare(b.name, 'es'))
+  const children = rawCategories.filter(c => c.parentId)
+  const categories = roots.flatMap(r => [r, ...children.filter(c => c.parentId === r.id).sort((a, b) => a.name.localeCompare(b.name, 'es'))])
 
   return (
     <>
