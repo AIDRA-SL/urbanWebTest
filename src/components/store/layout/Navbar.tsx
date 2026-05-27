@@ -106,31 +106,36 @@ export function Navbar({ categories }: NavbarProps) {
         <div className="hidden md:block border-t border-gray-100/70">
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
             <nav className="flex items-center justify-center gap-10 h-10">
-              {categories.map((cat) => (
-                <div key={cat.id} className="relative group">
-                  <Link
-                    href={`/categoria/${cat.slug}`}
-                    className="text-xs uppercase tracking-widest text-gray-600 hover:text-black transition-colors py-1"
-                  >
-                    {cat.name}
-                  </Link>
-                  {cat.children.length > 0 && (
-                    <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block min-w-[160px] z-50">
-                      <div className="bg-white/90 backdrop-blur-md border border-white/40 shadow-xl shadow-black/10 py-2">
-                        {cat.children.map((child) => (
-                          <Link
-                            key={child.id}
-                            href={`/categoria/${cat.slug}/${child.slug}`}
-                            className="block px-4 py-2 text-xs uppercase tracking-wider text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                          >
-                            {child.name}
-                          </Link>
-                        ))}
-                      </div>
+              {categories
+                .filter((cat) => !['calzado', 'rebajas', 'marcas'].includes(cat.slug.toLowerCase()))
+                .map((cat) => {
+                  const visibleChildren = cat.children.filter((c) => c.slug.toLowerCase() !== 'cinturones')
+                  return (
+                    <div key={cat.id} className="relative group">
+                      <Link
+                        href={`/categoria/${cat.slug}`}
+                        className="text-xs uppercase tracking-widest text-gray-600 hover:text-black transition-colors py-1"
+                      >
+                        {cat.name}
+                      </Link>
+                      {visibleChildren.length > 0 && (
+                        <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block min-w-[160px] z-50">
+                          <div className="bg-white/90 backdrop-blur-md border border-white/40 shadow-xl shadow-black/10 py-2">
+                            {visibleChildren.map((child) => (
+                              <Link
+                                key={child.id}
+                                href={`/categoria/${cat.slug}/${child.slug}`}
+                                className="block px-4 py-2 text-xs uppercase tracking-wider text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
+                              >
+                                {child.name}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              ))}
+                  )
+                })}
               <Link
                 href="/marcas"
                 className="text-xs uppercase tracking-widest text-gray-600 hover:text-black transition-colors"
@@ -185,28 +190,33 @@ export function Navbar({ categories }: NavbarProps) {
 
         {/* Nav links */}
         <nav className="flex-1 overflow-y-auto px-6 py-6 flex flex-col">
-          {categories.map((cat, idx) => (
-            <div key={cat.id}>
-              {idx > 0 && <div className="h-px bg-gray-100 my-1" />}
-              <Link
-                href={`/categoria/${cat.slug}`}
-                className="block py-3 text-xs uppercase tracking-widest font-semibold text-gray-900 hover:text-gray-500 transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                {cat.name}
-              </Link>
-              {cat.children.map((child) => (
-                <Link
-                  key={child.id}
-                  href={`/categoria/${cat.slug}/${child.slug}`}
-                  className="block py-2 pl-3 text-xs uppercase tracking-wider text-gray-400 hover:text-gray-700 transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {child.name}
-                </Link>
-              ))}
-            </div>
-          ))}
+          {categories
+            .filter((cat) => !['calzado', 'rebajas', 'marcas'].includes(cat.slug.toLowerCase()))
+            .map((cat, idx) => {
+              const visibleChildren = cat.children.filter((c) => c.slug.toLowerCase() !== 'cinturones')
+              return (
+                <div key={cat.id}>
+                  {idx > 0 && <div className="h-px bg-gray-100 my-1" />}
+                  <Link
+                    href={`/categoria/${cat.slug}`}
+                    className="block py-3 text-xs uppercase tracking-widest font-semibold text-gray-900 hover:text-gray-500 transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {cat.name}
+                  </Link>
+                  {visibleChildren.map((child) => (
+                    <Link
+                      key={child.id}
+                      href={`/categoria/${cat.slug}/${child.slug}`}
+                      className="block py-2 pl-3 text-xs uppercase tracking-wider text-gray-400 hover:text-gray-700 transition-colors"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {child.name}
+                    </Link>
+                  ))}
+                </div>
+              )
+            })}
           <div className="h-px bg-gray-100 my-1" />
           <Link
             href="/marcas"
