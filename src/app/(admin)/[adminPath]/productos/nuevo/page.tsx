@@ -13,7 +13,7 @@ export default async function NewProductPage({ params }: Props) {
   const { adminPath } = await params
   const [categories, brands] = await Promise.all([
     prisma.category.findMany({
-      where: { isActive: true },
+      where: { isActive: true, NOT: { slug: { startsWith: 'marcas' } } },
       orderBy: { name: 'asc' },
       select: { id: true, name: true, slug: true, parentId: true },
     }),
