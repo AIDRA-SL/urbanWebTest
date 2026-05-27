@@ -45,6 +45,8 @@ model Product {
   sku          String?          @unique
   isActive     Boolean          @default(true)
   isFeatured   Boolean          @default(false)
+  brandId      String?
+  brand        Brand?           @relation(fields: [brandId], references: [id])
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
@@ -60,6 +62,7 @@ model Product {
   @@index([isFeatured])
   @@index([isActive, isFeatured])
   @@index([isActive, createdAt])
+  @@index([brandId])
 }
 
 model ProductVideo {
@@ -340,15 +343,18 @@ model Verification {
 }
 
 // ─────────────────────────────────────────────
-// BRANDS (logos colaboradores en landing)
+// BRANDS
 // ─────────────────────────────────────────────
 
 model Brand {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
+  slug      String?   @unique
   logoUrl   String
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  products  Product[]
 }

@@ -14,6 +14,11 @@ interface Category {
   parentId: string | null
 }
 
+interface Brand {
+  id: string
+  name: string
+}
+
 interface ProductData {
   id?: string
   name?: string
@@ -23,6 +28,7 @@ interface ProductData {
   sku?: string | null
   isActive?: boolean
   isFeatured?: boolean
+  brandId?: string | null
   categories?: { id: string; slug: string }[]
   images?: { id: string; url: string; isPrimary: boolean }[]
   videos?: { id?: string; url: string }[]
@@ -31,6 +37,7 @@ interface ProductData {
 
 interface Props {
   categories: Category[]
+  brands: Brand[]
   adminPath: string
   product?: ProductData
 }
@@ -60,7 +67,7 @@ function detectSizeMode(
   return isShoes ? 'calzado' : 'ropa'
 }
 
-export function ProductFormClient({ categories, adminPath, product }: Props) {
+export function ProductFormClient({ categories, brands, adminPath, product }: Props) {
   const router = useRouter()
   const isEdit = !!product?.id
 
@@ -71,6 +78,7 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
   const [sku, setSku] = useState(product?.sku ?? '')
   const [isActive, setIsActive] = useState(product?.isActive ?? true)
   const [isFeatured, setIsFeatured] = useState(product?.isFeatured ?? false)
+  const [selectedBrand, setSelectedBrand] = useState<string>(product?.brandId ?? '')
   const [selectedCats, setSelectedCats] = useState<string[]>(product?.categories?.map((c) => c.id) ?? [])
   const [images, setImages] = useState<{ url: string; isPrimary: boolean }[]>(product?.images ?? [])
   const [variants, setVariants] = useState<{ size: string | null; stock: number }[]>(
@@ -234,6 +242,7 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
         sku: sku || null,
         isActive,
         isFeatured,
+        brandId: selectedBrand || null,
         videos,
         categoryIds: selectedCats,
         images,
@@ -545,6 +554,20 @@ export function ProductFormClient({ categories, adminPath, product }: Props) {
             <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="w-4 h-4" />
             <span className="text-sm">Destacado en homepage</span>
           </label>
+        </div>
+
+        <div className="bg-white border border-gray-100 p-6">
+          <h3 className="text-xs uppercase tracking-widest text-gray-500 mb-3">Marca</h3>
+          <select
+            value={selectedBrand}
+            onChange={(e) => setSelectedBrand(e.target.value)}
+            className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
+          >
+            <option value="">Sin marca</option>
+            {brands.map((brand) => (
+              <option key={brand.id} value={brand.id}>{brand.name}</option>
+            ))}
+          </select>
         </div>
 
         <div className="bg-white border border-gray-100 p-6">

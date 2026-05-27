@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth, isAdminSession } from '@/lib/auth'
+import { slugify } from '@/lib/utils'
 import { revalidateTag } from 'next/cache'
 
 export async function GET() {
@@ -19,8 +20,15 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const { name, logoUrl, sortOrder } = body
 
+  const base = slugify(name)
+  let slug = base
+  let i = 2
+  while (await prisma.brand.findFirst({ where: { slug } })) {
+    slug = `${base}-${i++}`
+  }
+
   const brand = await prisma.brand.create({
-    data: { name, logoUrl, sortOrder: sortOrder ?? 0 },
+    data: { name, slug, logoUrl, sortOrder: sortOrder ?? 0 },
   })
 
   revalidateTag('brands')

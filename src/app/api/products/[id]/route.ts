@@ -33,7 +33,7 @@ export async function PUT(
 
   const { id } = await params
   const body = await request.json()
-  const { name, description, price, comparePrice, sku, isActive, isFeatured, categoryIds, images, videos, variants } = body
+  const { name, description, price, comparePrice, sku, isActive, isFeatured, brandId, categoryIds, images, videos, variants } = body
 
   // Get slug before update for revalidatePath
   const existing = await prisma.product.findUnique({ where: { id }, select: { slug: true } })
@@ -53,6 +53,7 @@ export async function PUT(
       sku: sku || null,
       isActive,
       isFeatured,
+      brandId: brandId || null,
       categories: {
         set: (categoryIds as string[])?.map((cid) => ({ id: cid })) ?? [],
       },

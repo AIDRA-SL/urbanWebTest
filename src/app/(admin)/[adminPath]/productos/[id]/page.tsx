@@ -25,16 +25,23 @@ export default async function EditProductPage({ params }: Props) {
 
   if (!product) notFound()
 
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: { name: 'asc' },
-    select: { id: true, name: true, slug: true, parentId: true },
-  })
+  const [categories, brands] = await Promise.all([
+    prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, slug: true, parentId: true },
+    }),
+    prisma.brand.findMany({
+      where: { isActive: true },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true },
+    }),
+  ])
 
   return (
     <>
       <AdminHeader title="Editar producto" subtitle={product.name} />
-      <ProductFormClient product={product} categories={categories} adminPath={adminPath} />
+      <ProductFormClient product={product} categories={categories} brands={brands} adminPath={adminPath} />
     </>
   )
 }
