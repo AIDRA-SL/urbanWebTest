@@ -35,12 +35,29 @@ const PRODUCTS = [
 ]
 
 const BRANDS = [
-  { name: 'Nike', logoUrl: 'https://logo.clearbit.com/nike.com', sortOrder: 0 },
-  { name: 'Adidas', logoUrl: 'https://logo.clearbit.com/adidas.com', sortOrder: 1 },
-  { name: 'New Balance', logoUrl: 'https://logo.clearbit.com/newbalance.com', sortOrder: 2 },
-  { name: 'Vans', logoUrl: 'https://logo.clearbit.com/vans.com', sortOrder: 3 },
-  { name: 'The North Face', logoUrl: 'https://logo.clearbit.com/thenorthface.com', sortOrder: 4 },
-  { name: 'Carhartt', logoUrl: 'https://logo.clearbit.com/carhartt.com', sortOrder: 5 },
+  { name: 'La Sal', logoUrl: '/uploads/brands/la-sal.png', sortOrder: 0 },
+  { name: 'My Brand', logoUrl: '/uploads/brands/my-brand.png', sortOrder: 1 },
+  { name: 'Mod Wave Movement', logoUrl: '/uploads/brands/mod-wave-movement.png', sortOrder: 2 },
+  { name: 'Redhouse', logoUrl: '/uploads/brands/redhouse.png', sortOrder: 3 },
+  { name: 'Relish', logoUrl: '/uploads/brands/relish.png', sortOrder: 4 },
+  { name: 'G2 Firenze', logoUrl: '/uploads/brands/g2-firenze.png', sortOrder: 5 },
+  { name: 'Frilivin', logoUrl: '/uploads/brands/frilivin.jpg', sortOrder: 6 },
+  { name: 'Run Of', logoUrl: '/uploads/brands/run-of.png', sortOrder: 7 },
+  { name: 'Karl Lagerfeld', logoUrl: '/uploads/brands/karl-lagerfeld.png', sortOrder: 8 },
+  { name: 'Rue Madam', logoUrl: '/uploads/brands/rue-madam.png', sortOrder: 9 },
+  { name: 'Dsquared2', logoUrl: '/uploads/brands/dsquared2.png', sortOrder: 10 },
+  { name: 'Another Trend', logoUrl: '/uploads/brands/another-trend.png', sortOrder: 11 },
+  { name: 'Antony Morato', logoUrl: '/uploads/brands/antony-morato.png', sortOrder: 12 },
+  { name: 'Alpe', logoUrl: '/uploads/brands/alpe.png', sortOrder: 13 },
+  { name: 'Alexander McQueen', logoUrl: '/uploads/brands/alexander-mcqueen.png', sortOrder: 14 },
+  { name: 'AM Couture', logoUrl: '/uploads/brands/am-couture.png', sortOrder: 15 },
+  { name: 'Versace Jeans Couture', logoUrl: '/uploads/brands/versace-jeans.png', sortOrder: 16 },
+  { name: 'Guess', logoUrl: '/uploads/brands/guess.webp', sortOrder: 17 },
+  { name: 'Imperial', logoUrl: '/uploads/brands/imperial.png', sortOrder: 18 },
+  { name: 'Please', logoUrl: '/uploads/brands/please.png', sortOrder: 19 },
+  { name: 'Sprayground', logoUrl: '/uploads/brands/sprayground.png', sortOrder: 20 },
+  { name: 'No Name', logoUrl: '/uploads/brands/no-name.png', sortOrder: 21 },
+  { name: 'SikSilk', logoUrl: '/uploads/brands/siksilk.png', sortOrder: 22 },
 ]
 
 async function main() {
@@ -63,6 +80,7 @@ async function main() {
     { name: 'Complementos', slug: 'complementos', sortOrder: 2, imageUrl: U('photo-1553062407-98eeb64c6a62') },
     { name: 'Calzado', slug: 'calzado', sortOrder: 3, imageUrl: U('photo-1542291026-7eec264c27ff') },
     { name: 'Rebajas', slug: 'rebajas', sortOrder: 4, imageUrl: U('photo-1607082348824-0a96f2a4b9da') },
+    { name: 'Marcas', slug: 'marcas', sortOrder: 5, imageUrl: U('photo-1441986300917-64674bd600d8') },
   ]
   for (const c of rootCats) {
     catMap[c.slug] = await prisma.category.upsert({ where: { slug: c.slug }, update: { imageUrl: c.imageUrl }, create: c })
@@ -96,9 +114,37 @@ async function main() {
     { name: 'Otros', slug: 'complementos-otros', p: 'complementos', o: 2 },
     { name: 'Hombre', slug: 'rebajas-hombre', p: 'rebajas', o: 0 },
     { name: 'Mujer', slug: 'rebajas-mujer', p: 'rebajas', o: 1 },
+    { name: 'La Sal', slug: 'marcas-la-sal', p: 'marcas', o: 0, imageUrl: '/uploads/brands/la-sal.png' },
+    { name: 'My Brand', slug: 'marcas-my-brand', p: 'marcas', o: 1, imageUrl: '/uploads/brands/my-brand.png' },
+    { name: 'Mod Wave Movement', slug: 'marcas-mod-wave-movement', p: 'marcas', o: 2, imageUrl: '/uploads/brands/mod-wave-movement.png' },
+    { name: 'Redhouse', slug: 'marcas-redhouse', p: 'marcas', o: 3, imageUrl: '/uploads/brands/redhouse.png' },
+    { name: 'Relish', slug: 'marcas-relish', p: 'marcas', o: 4, imageUrl: '/uploads/brands/relish.png' },
+    { name: 'G2 Firenze', slug: 'marcas-g2-firenze', p: 'marcas', o: 5, imageUrl: '/uploads/brands/g2-firenze.png' },
+    { name: 'Frilivin', slug: 'marcas-frilivin', p: 'marcas', o: 6, imageUrl: '/uploads/brands/frilivin.jpg' },
+    { name: 'Run Of', slug: 'marcas-run-of', p: 'marcas', o: 7, imageUrl: '/uploads/brands/run-of.png' },
+    { name: 'Karl Lagerfeld', slug: 'marcas-karl-lagerfeld', p: 'marcas', o: 8, imageUrl: '/uploads/brands/karl-lagerfeld.png' },
+    { name: 'Rue Madam', slug: 'marcas-rue-madam', p: 'marcas', o: 9, imageUrl: '/uploads/brands/rue-madam.png' },
+    { name: 'Dsquared2', slug: 'marcas-dsquared2', p: 'marcas', o: 10, imageUrl: '/uploads/brands/dsquared2.png' },
+    { name: 'Another Trend', slug: 'marcas-another-trend', p: 'marcas', o: 11, imageUrl: '/uploads/brands/another-trend.png' },
+    { name: 'Antony Morato', slug: 'marcas-antony-morato', p: 'marcas', o: 12, imageUrl: '/uploads/brands/antony-morato.png' },
+    { name: 'Alpe', slug: 'marcas-alpe', p: 'marcas', o: 13, imageUrl: '/uploads/brands/alpe.png' },
+    { name: 'Alexander McQueen', slug: 'marcas-alexander-mcqueen', p: 'marcas', o: 14, imageUrl: '/uploads/brands/alexander-mcqueen.png' },
+    { name: 'AM Couture', slug: 'marcas-am-couture', p: 'marcas', o: 15, imageUrl: '/uploads/brands/am-couture.png' },
+    { name: 'Versace Jeans Couture', slug: 'marcas-versace-jeans-couture', p: 'marcas', o: 16, imageUrl: '/uploads/brands/versace-jeans.png' },
+    { name: 'Guess', slug: 'marcas-guess', p: 'marcas', o: 17, imageUrl: '/uploads/brands/guess.webp' },
+    { name: 'Imperial', slug: 'marcas-imperial', p: 'marcas', o: 18, imageUrl: '/uploads/brands/imperial.png' },
+    { name: 'Please', slug: 'marcas-please', p: 'marcas', o: 19, imageUrl: '/uploads/brands/please.png' },
+    { name: 'Sprayground', slug: 'marcas-sprayground', p: 'marcas', o: 20, imageUrl: '/uploads/brands/sprayground.png' },
+    { name: 'No Name', slug: 'marcas-no-name', p: 'marcas', o: 21, imageUrl: '/uploads/brands/no-name.png' },
+    { name: 'SikSilk', slug: 'marcas-siksilk', p: 'marcas', o: 22, imageUrl: '/uploads/brands/siksilk.png' },
   ]
   for (const sc of subCats) {
-    catMap[sc.slug] = await prisma.category.upsert({ where: { slug: sc.slug }, update: {}, create: { name: sc.name, slug: sc.slug, parentId: catMap[sc.p].id, sortOrder: sc.o } })
+    const scData = sc as typeof sc & { imageUrl?: string }
+    catMap[sc.slug] = await prisma.category.upsert({
+      where: { slug: sc.slug },
+      update: scData.imageUrl ? { imageUrl: scData.imageUrl } : {},
+      create: { name: sc.name, slug: sc.slug, parentId: catMap[sc.p].id, sortOrder: sc.o, ...(scData.imageUrl ? { imageUrl: scData.imageUrl } : {}) },
+    })
   }
   console.log('Categorias OK')
 
@@ -149,9 +195,15 @@ async function main() {
     console.log('Promociones OK')
   }
 
+  // Remove old placeholder brands from previous seed
+  await prisma.brand.deleteMany({ where: { name: { in: ['Nike', 'Adidas', 'New Balance', 'Vans', 'The North Face', 'Carhartt'] } } })
   for (const b of BRANDS) {
     const exists = await prisma.brand.findFirst({ where: { name: b.name } })
-    if (!exists) await prisma.brand.create({ data: { ...b, isActive: true } })
+    if (exists) {
+      await prisma.brand.update({ where: { id: exists.id }, data: { logoUrl: b.logoUrl, sortOrder: b.sortOrder } })
+    } else {
+      await prisma.brand.create({ data: { ...b, isActive: true } })
+    }
   }
   console.log(`${BRANDS.length} marcas OK`)
 

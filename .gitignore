@@ -46,9 +46,10 @@ prisma/*.db
 dev.db
 *.db-journal
 
-# uploads (keep directory, not files)
+# uploads (keep directory, not files — but track brand logos as static assets)
 /public/uploads/*
 !/public/uploads/.gitkeep
+!/public/uploads/brands/
 
 /generated/prisma
 
