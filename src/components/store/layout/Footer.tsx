@@ -111,7 +111,7 @@ export function Footer() {
               {[
                 { label: 'Mi cuenta', href: '/mi-cuenta' },
                 { label: 'Mis pedidos', href: '/mi-cuenta' },
-                { label: 'Contacto', href: '/ayuda/contacto' },
+                { label: 'Contacto', href: '/contacto' },
                 { label: 'Envíos y devoluciones', href: '/ayuda/envios-devoluciones' },
                 { label: 'Cómo comprar', href: '/ayuda/como-comprar' },
               ].map(({ label, href }) => (

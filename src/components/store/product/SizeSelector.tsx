@@ -19,11 +19,8 @@ export function SizeSelector({ variants, selected, onSelect }: Props) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-3">
         <span className="text-xs font-medium uppercase tracking-wider">Talla</span>
-        <button className="text-xs text-gray-500 underline hover:text-black transition-colors">
-          Guía de tallas
-        </button>
       </div>
       <div className="flex flex-wrap gap-2">
         {sizeVariants.map((variant) => {

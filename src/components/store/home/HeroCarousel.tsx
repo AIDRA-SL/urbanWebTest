@@ -8,7 +8,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Slide {
   id: string
-  imageUrl: string
+  imageUrl: string | null
+  videoUrl: string | null
   headline: string | null
   subheadline: string | null
   ctaText: string | null
@@ -55,13 +56,24 @@ export function HeroCarousel({ slides }: Props) {
         {slides.map((slide, i) => (
           <div key={slide.id} className="flex-none w-full">
             <div className="relative aspect-[16/9] sm:aspect-[21/9] bg-gray-100">
-              <Image
-                src={slide.imageUrl}
-                alt={slide.headline ?? 'UrbanStore'}
-                fill
-                className="object-cover"
-                priority={i === 0}
-              />
+              {slide.videoUrl ? (
+                <video
+                  src={slide.videoUrl}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+              ) : slide.imageUrl ? (
+                <Image
+                  src={slide.imageUrl}
+                  alt={slide.headline ?? 'UrbanStore'}
+                  fill
+                  className="object-cover"
+                  priority={i === 0}
+                />
+              ) : null}
               {(slide.headline || slide.ctaText) && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center text-white px-4">

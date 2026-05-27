@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const slide = await prisma.heroSlide.create({
     data: {
-      imageUrl: body.imageUrl,
+      imageUrl: body.imageUrl ?? null,
+      videoUrl: body.videoUrl ?? null,
       mobileImageUrl: body.mobileImageUrl ?? null,
       headline: body.headline ?? null,
       subheadline: body.subheadline ?? null,
@@ -46,7 +47,8 @@ export async function PUT(request: NextRequest) {
   const slide = await prisma.heroSlide.update({
     where: { id },
     data: {
-      imageUrl: data.imageUrl,
+      imageUrl: data.imageUrl ?? null,
+      videoUrl: data.videoUrl ?? null,
       mobileImageUrl: data.mobileImageUrl ?? null,
       headline: data.headline ?? null,
       subheadline: data.subheadline ?? null,

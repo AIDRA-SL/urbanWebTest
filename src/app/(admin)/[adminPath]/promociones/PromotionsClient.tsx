@@ -81,50 +81,6 @@ export function PromotionsClient({ promotions, products }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Current promotions */}
-      <div className="bg-white border border-gray-100">
-        {promotions.length === 0 ? (
-          <p className="text-sm text-gray-400 py-8 text-center">No hay promociones activas.</p>
-        ) : (
-          <div className="divide-y divide-gray-50">
-            {promotions.map((promo) => (
-              <div key={promo.id} className="flex items-center gap-4 px-4 py-3">
-                {promo.product.images[0] && (
-                  <div className="w-12 h-12 bg-gray-100 flex-shrink-0 overflow-hidden">
-                    <Image src={promo.product.images[0].url} alt={promo.product.name} width={48} height={48} className="w-full h-full object-cover" />
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{promo.product.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    {promo.label && (
-                      <span className="text-xs px-1.5 py-0.5 text-white" style={{ backgroundColor: promo.badgeColor ?? '#000' }}>
-                        {promo.label}
-                      </span>
-                    )}
-                    {promo.discountPct && (
-                      <span className="text-xs text-red-600">-{promo.discountPct}%</span>
-                    )}
-                    <span className="text-xs text-gray-400">{formatPrice(promo.product.price)}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleToggle(promo)}
-                    className={`text-xs px-2 py-1 border ${promo.isActive ? 'border-green-200 text-green-600' : 'border-gray-200 text-gray-400'}`}
-                  >
-                    {promo.isActive ? 'Activa' : 'Inactiva'}
-                  </button>
-                  <button onClick={() => handleDelete(promo.id)} className="p-1 text-gray-400 hover:text-red-600">
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       <Button onClick={() => setShowPicker(!showPicker)} variant="outline" size="sm">
         <Plus size={14} /> Añadir promoción
       </Button>
@@ -171,6 +127,50 @@ export function PromotionsClient({ promotions, products }: Props) {
           </div>
         </div>
       )}
+
+      {/* Current promotions */}
+      <div className="bg-white border border-gray-100">
+        {promotions.length === 0 ? (
+          <p className="text-sm text-gray-400 py-8 text-center">No hay promociones activas.</p>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {promotions.map((promo) => (
+              <div key={promo.id} className="flex items-center gap-4 px-4 py-3">
+                {promo.product.images[0] && (
+                  <div className="w-12 h-12 bg-gray-100 flex-shrink-0 overflow-hidden">
+                    <Image src={promo.product.images[0].url} alt={promo.product.name} width={48} height={48} className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{promo.product.name}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {promo.label && (
+                      <span className="text-xs px-1.5 py-0.5 text-white" style={{ backgroundColor: promo.badgeColor ?? '#000' }}>
+                        {promo.label}
+                      </span>
+                    )}
+                    {promo.discountPct && (
+                      <span className="text-xs text-red-600">-{promo.discountPct}%</span>
+                    )}
+                    <span className="text-xs text-gray-400">{formatPrice(promo.product.price)}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleToggle(promo)}
+                    className={`text-xs px-2 py-1 border ${promo.isActive ? 'border-green-200 text-green-600' : 'border-gray-200 text-gray-400'}`}
+                  >
+                    {promo.isActive ? 'Activa' : 'Inactiva'}
+                  </button>
+                  <button onClick={() => handleDelete(promo.id)} className="p-1 text-gray-400 hover:text-red-600">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

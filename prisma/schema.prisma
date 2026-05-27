@@ -126,7 +126,8 @@ model Promotion {
 
 model HeroSlide {
   id             String   @id @default(cuid())
-  imageUrl       String
+  imageUrl       String?
+  videoUrl       String?
   mobileImageUrl String?
   headline       String?
   subheadline    String?

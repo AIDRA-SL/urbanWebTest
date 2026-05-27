@@ -6,13 +6,14 @@ import Image from 'next/image'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { ImageCropModal } from '@/components/ui/ImageCropModal'
-import { Trash2, Plus, Upload } from 'lucide-react'
+import { Trash2, Plus, Upload, Video } from 'lucide-react'
 
 const HERO_ASPECT = 16 / 9
 
 interface Slide {
   id: string
-  imageUrl: string
+  imageUrl: string | null
+  videoUrl: string | null
   headline: string | null
   subheadline: string | null
   ctaText: string | null
@@ -29,6 +30,7 @@ export function HeroAdminClient({ slides }: Props) {
   const router = useRouter()
   const [showForm, setShowForm] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
+  const [videoUrl, setVideoUrl] = useState('')
   const [headline, setHeadline] = useState('')
   const [subheadline, setSubheadline] = useState('')
   const [ctaText, setCtaText] = useState('')
@@ -41,6 +43,12 @@ export function HeroAdminClient({ slides }: Props) {
   const handleFileSelect = (files: FileList | null) => {
     if (!files?.[0]) return
     const file = files[0]
+
+    if (file.type.startsWith('video/')) {
+      uploadVideo(file)
+      return
+    }
+
     const reader = new FileReader()
     reader.onload = (e) => {
       if (e.target?.result) {
@@ -49,6 +57,17 @@ export function HeroAdminClient({ slides }: Props) {
       }
     }
     reader.readAsDataURL(file)
+  }
+
+  const uploadVideo = async (file: File) => {
+    setUploading(true)
+    const fd = new FormData()
+    fd.append('file', file, file.name)
+    fd.append('subfolder', 'hero')
+    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    const data = await res.json()
+    if (data.url) setVideoUrl(data.url)
+    setUploading(false)
   }
 
   const uploadBlob = async (blob: Blob) => {
@@ -66,19 +85,25 @@ export function HeroAdminClient({ slides }: Props) {
   }
 
   const handleCreate = async () => {
-    if (!imageUrl) return
+    if (!imageUrl && !videoUrl) return
     setSaving(true)
     await fetch('/api/hero', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        imageUrl, headline: headline || null, subheadline: subheadline || null,
-        ctaText: ctaText || null, ctaLink: ctaLink || null, sortOrder: slides.length,
+        imageUrl: imageUrl || null,
+        videoUrl: videoUrl || null,
+        headline: headline || null,
+        subheadline: subheadline || null,
+        ctaText: ctaText || null,
+        ctaLink: ctaLink || null,
+        sortOrder: slides.length,
       }),
     })
     setSaving(false)
     setShowForm(false)
     setImageUrl('')
+    setVideoUrl('')
     setHeadline('')
     router.refresh()
   }
@@ -98,6 +123,8 @@ export function HeroAdminClient({ slides }: Props) {
     router.refresh()
   }
 
+  const hasMedia = imageUrl || videoUrl
+
   return (
     <>
     {cropSrc && cropFile && (
@@ -116,10 +143,19 @@ export function HeroAdminClient({ slides }: Props) {
         {slides.map((slide) => (
           <div key={slide.id} className={`bg-white border ${slide.isActive ? 'border-gray-200' : 'border-gray-100 opacity-60'} overflow-hidden`}>
             <div className="relative aspect-[16/9] bg-gray-100">
-              <Image src={slide.imageUrl} alt={slide.headline ?? 'Slide'} fill className="object-cover" />
+              {slide.videoUrl ? (
+                <video src={slide.videoUrl} className="w-full h-full object-cover" muted playsInline />
+              ) : slide.imageUrl ? (
+                <Image src={slide.imageUrl} alt={slide.headline ?? 'Slide'} fill className="object-cover" />
+              ) : null}
               {!slide.isActive && (
                 <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
                   <span className="text-xs text-gray-500 uppercase tracking-wider">Oculto</span>
+                </div>
+              )}
+              {slide.videoUrl && (
+                <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-1.5 py-0.5 flex items-center gap-1">
+                  <Video size={10} /> Video
                 </div>
               )}
             </div>
@@ -154,7 +190,11 @@ export function HeroAdminClient({ slides }: Props) {
         <div className="bg-white border border-gray-100 p-6 space-y-4 max-w-xl">
           <h3 className="text-xs uppercase tracking-widest text-gray-500">Nuevo slide</h3>
 
-          {imageUrl ? (
+          {videoUrl ? (
+            <div className="relative aspect-[16/9] bg-black overflow-hidden">
+              <video src={videoUrl} className="w-full h-full object-cover" controls muted />
+            </div>
+          ) : imageUrl ? (
             <div className="relative aspect-[16/9] bg-gray-100 overflow-hidden">
               <Image src={imageUrl} alt="Preview" fill className="object-cover" />
             </div>
@@ -163,11 +203,16 @@ export function HeroAdminClient({ slides }: Props) {
               {uploading ? <span className="text-xs text-gray-400">Subiendo…</span> : (
                 <>
                   <Upload size={20} className="text-gray-400 mb-1" />
-                  <span className="text-xs text-gray-400">Subir imagen (recomendado: 1920×1080px)</span>
-                  <span className="text-xs text-gray-300 mt-0.5">Formato 16:9 · Se recortará automáticamente</span>
+                  <span className="text-xs text-gray-400">Subir imagen o video (recomendado: 1920×1080px)</span>
+                  <span className="text-xs text-gray-300 mt-0.5">Formato 16:9 · Imagen o MP4/MOV</span>
                 </>
               )}
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => { handleFileSelect(e.target.files); e.target.value = '' }} />
+              <input
+                type="file"
+                accept="image/*,video/mp4,video/quicktime"
+                className="hidden"
+                onChange={(e) => { handleFileSelect(e.target.files); e.target.value = '' }}
+              />
             </label>
           )}
 
@@ -178,7 +223,7 @@ export function HeroAdminClient({ slides }: Props) {
             <Input label="Link del botón" value={ctaLink} onChange={(e) => setCtaLink(e.target.value)} placeholder="/categoria/novedades" />
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleCreate} loading={saving} size="sm" disabled={!imageUrl}>Crear slide</Button>
+            <Button onClick={handleCreate} loading={saving} size="sm" disabled={!hasMedia}>Crear slide</Button>
             <Button variant="ghost" size="sm" onClick={() => setShowForm(false)}>Cancelar</Button>
           </div>
         </div>
