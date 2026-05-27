@@ -107,9 +107,9 @@ export function Navbar({ categories }: NavbarProps) {
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
             <nav className="flex items-center justify-center gap-10 h-10">
               {categories
-                .filter((cat) => !['calzado', 'rebajas', 'marcas'].includes(cat.slug.toLowerCase()))
+                .filter((cat) => cat.slug.toLowerCase() !== 'marcas')
                 .map((cat) => {
-                  const visibleChildren = cat.children.filter((c) => c.slug.toLowerCase() !== 'cinturones')
+                  const visibleChildren = cat.children
                   return (
                     <div key={cat.id} className="relative group">
                       <Link
@@ -191,9 +191,9 @@ export function Navbar({ categories }: NavbarProps) {
         {/* Nav links */}
         <nav className="flex-1 overflow-y-auto px-6 py-6 flex flex-col">
           {categories
-            .filter((cat) => !['calzado', 'rebajas', 'marcas'].includes(cat.slug.toLowerCase()))
+            .filter((cat) => cat.slug.toLowerCase() !== 'marcas')
             .map((cat, idx) => {
-              const visibleChildren = cat.children.filter((c) => c.slug.toLowerCase() !== 'cinturones')
+              const visibleChildren = cat.children
               return (
                 <div key={cat.id}>
                   {idx > 0 && <div className="h-px bg-gray-100 my-1" />}

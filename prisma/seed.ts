@@ -18,7 +18,7 @@ const PRODUCTS = [
   { name: 'Sudadera Urban Classic', slug: 'sudadera-urban-classic', description: 'Sudadera con capucha de algodon premium. Interior afelpado, bolsillo canguro.', price: 59.95, comparePrice: 79.95, isFeatured: true, categories: ['hombre-sudaderas','hombre'], sizes: ['S','M','L','XL','XXL'], images: [U('photo-1556821840-3a63f95609a7'), U('photo-1509942774463-acf339cf87d5')] },
   { name: 'Pantalon Cargo Beige', slug: 'pantalon-cargo-beige', description: 'Pantalon cargo con multiples bolsillos. Tela resistente y comoda.', price: 79.95, comparePrice: null, isFeatured: true, categories: ['hombre-pantalones','hombre'], sizes: ['S','M','L','XL'], images: [U('photo-1624378441864-6359e1b2c94e'), U('photo-1606107557195-0e29a4b5b4aa')] },
   { name: 'Camiseta Oversize Negro', slug: 'camiseta-oversize-negro', description: 'Camiseta oversize de algodon pesado 220g. Corte holgado moderno.', price: 34.95, comparePrice: null, isFeatured: false, categories: ['hombre-camisetas','hombre'], sizes: ['S','M','L','XL'], images: [U('photo-1503342394128-c104d54dba01'), U('photo-1583743814966-8936f5b7be1a')] },
-  { name: 'Zapatillas Runner Pro', slug: 'zapatillas-runner-pro', description: 'Zapatillas para running y uso casual. Suela amortiguadora.', price: 89.95, comparePrice: 119.95, isFeatured: true, categories: ['hombre-zapatillas','hombre','calzado'], sizes: ['40','41','42','43','44','45'], images: [U('photo-1542291026-7eec264c27ff'), U('photo-1606107557195-0e29a4b5b4aa')] },
+  { name: 'Zapatillas Runner Pro', slug: 'zapatillas-runner-pro', description: 'Zapatillas para running y uso casual. Suela amortiguadora.', price: 89.95, comparePrice: 119.95, isFeatured: true, categories: ['hombre-zapatillas','hombre'], sizes: ['40','41','42','43','44','45'], images: [U('photo-1542291026-7eec264c27ff'), U('photo-1606107557195-0e29a4b5b4aa')] },
   { name: 'Gorra Urban Snapback', slug: 'gorra-urban-snapback', description: 'Gorra con visera plana y cierre snapback. 100% algodon estructurado.', price: 24.95, comparePrice: null, isFeatured: false, categories: ['complementos'], sizes: [], images: [U('photo-1588850561407-ed78c282e89b'), U('photo-1521369909029-2afed882baaa')] },
   { name: 'Sudadera Crewneck Gris', slug: 'sudadera-crewneck-gris', description: 'Sudadera sin capucha de cuello redondo. Algodon con elastano.', price: 49.95, comparePrice: 64.95, isFeatured: true, categories: ['hombre-sudaderas','hombre'], sizes: ['XS','S','M','L','XL'], images: [U('photo-1517263904808-5dc91e3e7044'), U('photo-1512327428940-c54e1e4b7fb8')] },
   { name: 'Pantalon Jogger Slim', slug: 'pantalon-jogger-slim', description: 'Pantalon jogger de corte slim. Cintura elastica y punos tobilleros.', price: 54.95, comparePrice: null, isFeatured: false, categories: ['hombre-joggers','hombre'], sizes: ['XS','S','M','L','XL'], images: [U('photo-1617196034183-421b4040ed20'), U('photo-1598033129183-c4f50c736f10')] },
@@ -79,9 +79,7 @@ async function main() {
     { name: 'Hombre', slug: 'hombre', sortOrder: 0, imageUrl: U('photo-1521572163474-6864f9cf17ab') },
     { name: 'Mujer', slug: 'mujer', sortOrder: 1, imageUrl: U('photo-1483985988355-763728e1935b') },
     { name: 'Complementos', slug: 'complementos', sortOrder: 2, imageUrl: U('photo-1553062407-98eeb64c6a62') },
-    { name: 'Calzado', slug: 'calzado', sortOrder: 3, imageUrl: U('photo-1542291026-7eec264c27ff') },
-    { name: 'Rebajas', slug: 'rebajas', sortOrder: 4, imageUrl: U('photo-1607082348824-0a96f2a4b9da') },
-    { name: 'Marcas', slug: 'marcas', sortOrder: 5, imageUrl: U('photo-1441986300917-64674bd600d8') },
+    { name: 'Marcas', slug: 'marcas', sortOrder: 3, imageUrl: U('photo-1441986300917-64674bd600d8') },
   ]
   for (const c of rootCats) {
     catMap[c.slug] = await prisma.category.upsert({ where: { slug: c.slug }, update: { imageUrl: c.imageUrl }, create: c })
@@ -111,10 +109,7 @@ async function main() {
     { name: 'Zapatillas', slug: 'mujer-zapatillas', p: 'mujer', o: 10 },
     { name: 'Jerseys', slug: 'mujer-jerseys', p: 'mujer', o: 11 },
     { name: 'Bolsos', slug: 'bolsos', p: 'complementos', o: 0 },
-    { name: 'Cinturones', slug: 'cinturones', p: 'complementos', o: 1 },
-    { name: 'Otros', slug: 'complementos-otros', p: 'complementos', o: 2 },
-    { name: 'Hombre', slug: 'rebajas-hombre', p: 'rebajas', o: 0 },
-    { name: 'Mujer', slug: 'rebajas-mujer', p: 'rebajas', o: 1 },
+    { name: 'Otros', slug: 'complementos-otros', p: 'complementos', o: 1 },
     { name: 'La Sal', slug: 'marcas-la-sal', p: 'marcas', o: 0, imageUrl: `${BLOB}/la-sal.png` },
     { name: 'My Brand', slug: 'marcas-my-brand', p: 'marcas', o: 1, imageUrl: `${BLOB}/my-brand.png` },
     { name: 'Mod Wave Movement', slug: 'marcas-mod-wave-movement', p: 'marcas', o: 2, imageUrl: `${BLOB}/mod-wave-movement.png` },

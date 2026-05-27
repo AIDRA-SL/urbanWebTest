@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function CategoryBanner({ categories }: Props) {
-  const featured = categories.filter((c) => c.imageUrl && c.slug.toLowerCase() !== 'calzado').slice(0, 4)
+  const featured = categories.filter((c) => c.imageUrl).slice(0, 4)
   if (featured.length === 0) return null
 
   return (
