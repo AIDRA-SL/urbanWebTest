@@ -122,7 +122,7 @@ export function BrandsClient({ brands }: Props) {
               key={brand.id}
               className={`bg-white border p-4 flex flex-col gap-3 ${brand.isActive ? 'border-gray-200' : 'border-gray-100 opacity-60'}`}
             >
-              <div className="relative h-20 w-full bg-gray-50 flex items-center justify-center overflow-hidden">
+              <div className="relative h-20 w-full bg-zinc-900 flex items-center justify-center overflow-hidden">
                 <Image
                   src={brand.logoUrl}
                   alt={brand.name}
