@@ -116,51 +116,11 @@ export function BrandsClient({ brands }: Props) {
       )}
 
       <div className="space-y-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {brands.map((brand) => (
-            <div
-              key={brand.id}
-              className={`bg-white border p-4 flex flex-col gap-3 ${brand.isActive ? 'border-gray-200' : 'border-gray-100 opacity-60'}`}
-            >
-              <div className="relative h-20 w-full bg-zinc-900 flex items-center justify-center overflow-hidden">
-                <Image
-                  src={brand.logoUrl}
-                  alt={brand.name}
-                  fill
-                  unoptimized
-                  className="object-contain p-3"
-                />
-              </div>
-              <p className="text-sm font-medium text-center truncate">{brand.name}</p>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  defaultValue={brand.sortOrder}
-                  onBlur={(e) => handleSortOrder(brand, e.target.value)}
-                  className="w-14 border border-gray-200 text-xs text-center px-1 py-1"
-                  title="Orden"
-                />
-                <button
-                  onClick={() => handleToggle(brand)}
-                  className={`flex-1 flex items-center justify-center gap-1 text-xs py-1 border transition-colors ${brand.isActive ? 'border-green-200 text-green-600' : 'border-gray-200 text-gray-400'}`}
-                >
-                  {brand.isActive ? <Eye size={12} /> : <EyeOff size={12} />}
-                  {brand.isActive ? 'Visible' : 'Oculta'}
-                </button>
-                <button onClick={() => handleDelete(brand.id)} className="p-1 text-gray-400 hover:text-red-600 transition-colors">
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
-          ))}
-
-          <button
-            onClick={() => setShowForm(true)}
-            className="border-2 border-dashed border-gray-200 h-40 flex flex-col items-center justify-center hover:border-gray-400 transition-colors"
-          >
-            <Plus size={20} className="text-gray-400 mb-1" />
-            <span className="text-xs text-gray-400">Nueva marca</span>
-          </button>
+        <div>
+          <Button onClick={() => setShowForm(true)} size="sm">
+            <Plus size={14} className="mr-1" />
+            Nueva marca
+          </Button>
         </div>
 
         {showForm && (
@@ -210,6 +170,45 @@ export function BrandsClient({ brands }: Props) {
             </div>
           </div>
         )}
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {brands.map((brand) => (
+            <div
+              key={brand.id}
+              className={`bg-white border p-4 flex flex-col gap-3 ${brand.isActive ? 'border-gray-200' : 'border-gray-100 opacity-60'}`}
+            >
+              <div className="relative h-20 w-full bg-zinc-900 flex items-center justify-center overflow-hidden">
+                <Image
+                  src={brand.logoUrl}
+                  alt={brand.name}
+                  fill
+                  unoptimized
+                  className="object-contain p-3"
+                />
+              </div>
+              <p className="text-sm font-medium text-center truncate">{brand.name}</p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  defaultValue={brand.sortOrder}
+                  onBlur={(e) => handleSortOrder(brand, e.target.value)}
+                  className="w-14 border border-gray-200 text-xs text-center px-1 py-1"
+                  title="Orden"
+                />
+                <button
+                  onClick={() => handleToggle(brand)}
+                  className={`flex-1 flex items-center justify-center gap-1 text-xs py-1 border transition-colors ${brand.isActive ? 'border-green-200 text-green-600' : 'border-gray-200 text-gray-400'}`}
+                >
+                  {brand.isActive ? <Eye size={12} /> : <EyeOff size={12} />}
+                  {brand.isActive ? 'Visible' : 'Oculta'}
+                </button>
+                <button onClick={() => handleDelete(brand.id)} className="p-1 text-gray-400 hover:text-red-600 transition-colors">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   )

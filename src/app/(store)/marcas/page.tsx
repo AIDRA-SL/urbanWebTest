@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { unstable_cache } from 'next/cache'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -12,7 +13,7 @@ const getBrands = unstable_cache(
   () => prisma.brand.findMany({
     where: { isActive: true },
     orderBy: { sortOrder: 'asc' },
-    select: { id: true, name: true, slug: true },
+    select: { id: true, name: true, slug: true, logoUrl: true },
   }),
   ['brands-public'],
   { revalidate: 300, tags: ['brands'] }
@@ -34,18 +35,34 @@ export default async function MarcasPage() {
       {brands.length === 0 ? (
         <p className="text-sm text-gray-400">No hay marcas disponibles.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-px bg-gray-100 border border-gray-100">
-          {brands.map((brand) => (
-            <Link
-              key={brand.id}
-              href={`/marcas/${brand.slug ?? brand.id}`}
-              className="bg-white px-6 py-5 flex items-center hover:bg-gray-50 transition-colors group"
-            >
-              <span className="text-sm font-medium uppercase tracking-wider group-hover:text-gray-500 transition-colors">
-                {brand.name}
-              </span>
-            </Link>
-          ))}
+        <div className="bg-zinc-900 py-14 px-6">
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+            {brands.map((brand) => (
+              <Link
+                key={brand.id}
+                href={`/marcas/${brand.slug ?? brand.id}`}
+                className="opacity-60 hover:opacity-100 transition-opacity duration-300"
+              >
+                {brand.logoUrl ? (
+                  <div className="relative h-20 w-44">
+                    <Image
+                      src={brand.logoUrl}
+                      alt={brand.name}
+                      fill
+                      unoptimized
+                      className="object-contain p-2"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-20 w-44 flex items-center justify-center">
+                    <span className="text-sm font-medium uppercase tracking-wider text-white text-center">
+                      {brand.name}
+                    </span>
+                  </div>
+                )}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

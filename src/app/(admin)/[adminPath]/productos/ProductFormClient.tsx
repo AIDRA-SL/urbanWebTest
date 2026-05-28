@@ -314,20 +314,25 @@ export function ProductFormClient({ categories, brands, adminPath, product }: Pr
                 )}
               </div>
             ))}
-            <div className="min-h-[80px] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-gray-400 transition-colors">
-              <Upload size={16} className="text-gray-400 mb-1" />
-              <label className="text-xs text-gray-400 cursor-pointer hover:text-gray-600">
-                Subir
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onClick={(e) => { (e.target as HTMLInputElement).value = '' }}
-                  onChange={(e) => handleDirectUpload(e.target.files)}
-                />
-              </label>
-              <label className="text-[10px] text-gray-300 cursor-pointer hover:text-gray-400 mt-0.5 underline underline-offset-2">
+            <div
+              className="min-h-[80px] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-gray-400 transition-colors cursor-pointer"
+              onClick={() => (document.getElementById('img-upload-direct') as HTMLInputElement)?.click()}
+            >
+              <Upload size={16} className="text-gray-400 mb-1 pointer-events-none" />
+              <span className="text-xs text-gray-400 pointer-events-none">Subir</span>
+              <input
+                id="img-upload-direct"
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onClick={(e) => { e.stopPropagation(); (e.target as HTMLInputElement).value = '' }}
+                onChange={(e) => handleDirectUpload(e.target.files)}
+              />
+              <label
+                className="text-[10px] text-gray-300 cursor-pointer hover:text-gray-400 mt-0.5 underline underline-offset-2"
+                onClick={(e) => e.stopPropagation()}
+              >
                 con recorte
                 <input
                   type="file"
